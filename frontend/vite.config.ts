@@ -7,6 +7,20 @@ import path from 'path';
 // Dokploy/Nixpacks tiene un bug interno con los symlinks de node_modules al ejecutar vite-plugin-pwa
 const isCI = process.env.NIXPACKS || process.env.CI || process.env.DOKPLOY;
 
+const mockPWAPlugin = () => ({
+  name: 'mock-pwa-register',
+  resolveId(id: string) {
+    if (id === 'virtual:pwa-register') {
+      return '\0virtual:pwa-register';
+    }
+  },
+  load(id: string) {
+    if (id === '\0virtual:pwa-register') {
+      return 'export const registerSW = () => {};';
+    }
+  }
+});
+
 export default defineConfig({
   plugins: [
     react(),
@@ -43,7 +57,7 @@ export default defineConfig({
           },
         ],
       },
-    })] : [])
+    })] : [mockPWAPlugin()])
   ],
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') },
