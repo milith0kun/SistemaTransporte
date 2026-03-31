@@ -106,6 +106,14 @@ async function main() {
   const reportRepo   = AppDataSource.getRepository(Report);
   const sanctionRepo  = AppDataSource.getRepository(Sanction);
 
+  
+  const userCount = await userRepo.count();
+  if (userCount > 0) {
+    console.log('✅ La base de datos ya contiene usuarios. Saltando seed para evitar duplicados.');
+    await AppDataSource.destroy();
+    return;
+  }
+
   const pwHash = await bcrypt.hash('Sfit2026!', 10);
 
   // Track created entities for cross-referencing
