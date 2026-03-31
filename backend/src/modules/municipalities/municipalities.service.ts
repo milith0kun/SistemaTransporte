@@ -9,6 +9,14 @@ export class MunicipalitiesService {
     @InjectRepository(Municipality) private munRepo: Repository<Municipality>,
   ) {}
 
+  async findAll() {
+    return this.munRepo.find({
+      select: ['id', 'name', 'province', 'district', 'region'],
+      where: { status: 'ACTIVO' as any },
+      order: { name: 'ASC' }
+    });
+  }
+
   async getConfig(id: string, requestingMunicipalityId: string): Promise<Record<string, any>> {
     if (id !== requestingMunicipalityId) {
       throw new ForbiddenException('No puede acceder a la configuración de otra municipalidad');

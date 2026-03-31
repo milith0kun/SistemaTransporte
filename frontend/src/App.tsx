@@ -8,6 +8,7 @@ import { ROLE_REDIRECT } from './lib/constants';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { MainLayout } from './components/layout/MainLayout';
 import { CitizenLayout } from './components/layout/CitizenLayout';
+import { InspectorLayout } from './components/layout/InspectorLayout';
 import { PageLoader } from './components/ui/spinner';
 
 import { LoginPage } from './pages/auth/LoginPage';
@@ -140,7 +141,7 @@ export default function App() {
 
           {/* Inspector */}
           <Route element={<ProtectedRoute allowedRoles={[UserRole.INSPECTOR]} />}>
-            <Route element={<MainLayout />}>
+            <Route element={<InspectorLayout />}>
               <Route path="/inspector"                          element={<InspectorDashboard />} />
               <Route path="/inspector/scan"                     element={<InspectorScanPage />} />
               <Route path="/inspector/scan/result/:inspectionId" element={<InspectorScanResultPage />} />

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   LayoutDashboard, MapPin, Activity, ShieldAlert, FileText,
-  CheckCircle2, XCircle, AlertTriangle, Clock, RefreshCw,
+  CheckCircle2, XCircle, AlertTriangle, RefreshCw,
+  Bus, UserCheck, CalendarDays
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -12,7 +13,7 @@ import {
 import api from '../../services/api';
 import { useSocket } from '../../hooks/useSocket';
 import { Report, ReportStatus, Trip, TripStatus, PaginatedResponse } from '../../types';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Spinner } from '../../components/ui/spinner';
@@ -41,7 +42,7 @@ interface DriverPie    { name: string; value: number; color: string }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const DRIVER_COLORS = ['#27AE60', '#E67E22', '#E74C3C'];
+const DRIVER_COLORS = ['#10b981', '#f59e0b', '#ef4444'];
 
 const STATUS_STYLES: Record<TripStatus, { label: string; variant: 'success'|'warning'|'muted'|'destructive'|'default' }> = {
   [TripStatus.EN_CURSO]:    { label: 'En curso',   variant: 'success' },
@@ -167,77 +168,89 @@ export function FiscalDashboardPage() {
 
   // ── KPI cards ─────────────────────────────────────────────────────────────
   const kpis = [
-    { label: 'Viajes activos',  value: stats.activeTrips,   Icon: MapPin,       color: 'text-blue-600',  bg: 'bg-blue-50' },
-    { label: 'Alertas fatiga',  value: stats.fatigueAlerts, Icon: Activity,     color: 'text-amber-600', bg: 'bg-amber-50' },
-    { label: 'Sanciones hoy',   value: stats.sanctionsToday,Icon: ShieldAlert,  color: 'text-red-600',   bg: 'bg-red-50' },
-    { label: 'Reportes pendientes',value: stats.reportsToday, Icon: FileText,   color: 'text-purple-600',bg: 'bg-purple-50' },
+    { label: 'Viajes Activos',      value: stats.activeTrips,   Icon: MapPin,       color: 'text-blue-600',   bg: 'bg-blue-50/50' },
+    { label: 'Alertas Fatiga',      value: stats.fatigueAlerts, Icon: Activity,     color: 'text-amber-600',  bg: 'bg-amber-50/50' },
+    { label: 'Sanciones (Hoy)',     value: stats.sanctionsToday,Icon: ShieldAlert,  color: 'text-rose-600',   bg: 'bg-rose-50/50' },
+    { label: 'Reportes Pendientes', value: stats.reportsToday,  Icon: FileText,   color: 'text-purple-600', bg: 'bg-purple-50/50' },
   ];
 
-  if (loading) return <div className="flex justify-center py-20"><Spinner /></div>;
+  if (loading) return <div className="flex items-center justify-center py-20 h-[50vh]"><Spinner size="lg" /></div>;
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 space-y-6 md:space-y-8 pb-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <LayoutDashboard className="h-6 w-6 text-[#1B4F72]" />
-          <h2 className="text-xl font-bold text-gray-900">Panel Fiscal</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl flex items-center gap-2">
+            <LayoutDashboard className="size-7 text-[#1B4F72]" />
+            Panel Fiscal / Central
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">Monitoreo en tiempo real de operaciones y sanciones.</p>
         </div>
-        <Button variant="outline" onClick={loadData} className="gap-2">
-          <RefreshCw className="h-4 w-4" /> Actualizar
+        <Button variant="outline" onClick={loadData} className="gap-2 shrink-0 self-start sm:self-auto h-10">
+          <RefreshCw className="size-4" /> 
+          <span className="hidden sm:inline">Actualizar</span>
         </Button>
       </div>
 
       {/* KPI cards */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {kpis.map(({ label, value, Icon, color, bg }) => (
-          <Card key={label}>
-            <CardContent className="flex items-center gap-4 pt-5">
-              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${bg}`}>
-                <Icon className={`h-6 w-6 ${color}`} />
+          <Card key={label} className={`border-none shadow-sm hover:shadow-md transition-shadow ${bg}`}>
+            <CardContent className="flex items-center gap-4 p-4 sm:p-6">
+              <div className={`flex size-12 shrink-0 items-center justify-center rounded-full bg-white shadow-sm`}>
+                <Icon className={`size-6 ${color}`} />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{value}</p>
-                <p className="text-xs text-gray-500">{label}</p>
+              <div className="space-y-1">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">{value}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-500">{label}</p>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Active trips table */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-base">Viajes en curso</CardTitle>
-              <Link to="/dashboard/trips" className="text-xs text-[#2E86C1] hover:underline">Ver todos →</Link>
+        <div className="xl:col-span-2 space-y-6">
+          <Card className="border-gray-200/60 shadow-sm overflow-hidden flex flex-col h-full">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 bg-gray-50/30 pb-4">
+              <div className="space-y-1">
+                <CardTitle className="text-lg">Viajes en Curso</CardTitle>
+                <CardDescription>Monitoreo de unidades desplazándose actualmente</CardDescription>
+              </div>
+              <Link to="/dashboard/trips" className="text-sm font-medium text-[#2E86C1] hover:text-[#1B4F72] hover:underline">
+                Ver todos
+              </Link>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent className="p-0 flex-1">
               {activeTrips.length === 0 ? (
-                <p className="py-8 text-center text-sm text-gray-400">Sin viajes activos ahora.</p>
+                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                  <Bus className="size-12 mb-3 opacity-20" />
+                  <p className="text-sm font-medium">Sin viajes activos en este momento.</p>
+                </div>
               ) : (
                 <Table>
                   <Thead>
                     <Tr>
-                      <Th>Placa</Th>
-                      <Th>Ruta</Th>
-                      <Th>Inicio</Th>
+                      <Th>Vehículo</Th>
+                      <Th>Ruta Asignada</Th>
+                      <Th>Hora Inicio</Th>
                       <Th>Estado</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
                     {activeTrips.map((t) => (
                       <Tr key={t.id}>
-                        <Td className="font-mono font-bold">{t.vehicle?.plate ?? '—'}</Td>
-                        <Td className="text-xs">
+                        <Td className="font-mono font-bold text-gray-900">{t.vehicle?.plate ?? '—'}</Td>
+                        <Td className="text-xs text-gray-600 max-w-[150px] truncate" title={t.route ? `${t.route.origin} → ${t.route.destination}` : ''}>
                           {t.route ? `${t.route.origin} → ${t.route.destination}` : '—'}
                         </Td>
-                        <Td className="text-xs text-gray-500">
+                        <Td className="text-xs text-gray-500 whitespace-nowrap">
                           {t.start_time ? formatDate(t.start_time) : '—'}
                         </Td>
                         <Td>
-                          <Badge variant={STATUS_STYLES[t.status]?.variant ?? 'default'}>
+                          <Badge variant={STATUS_STYLES[t.status]?.variant ?? 'default'} className="whitespace-nowrap">
                             {STATUS_STYLES[t.status]?.label ?? t.status}
                           </Badge>
                         </Td>
@@ -251,99 +264,128 @@ export function FiscalDashboardPage() {
         </div>
 
         {/* Real-time alert feed */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-              </span>
-              Alertas en tiempo real
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="max-h-72 overflow-y-auto space-y-2">
-            {alerts.length === 0 ? (
-              <p className="py-6 text-center text-xs text-gray-400">Sin alertas recientes.</p>
-            ) : (
-              alerts.map((a) => (
-                <div
-                  key={a.id}
-                  className={[
-                    'rounded-lg border px-3 py-2 text-xs transition-all duration-700',
-                    a.fresh
-                      ? 'border-amber-300 bg-amber-50 scale-[1.02]'
-                      : 'border-gray-100 bg-gray-50',
-                  ].join(' ')}
-                >
-                  <p className="font-medium text-gray-700 truncate">{a.message}</p>
-                  <p className="text-gray-400 mt-0.5">{new Date(a.ts).toLocaleTimeString('es-PE')}</p>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <Card className="border-gray-200/60 shadow-sm flex flex-col h-full">
+            <CardHeader className="border-b border-gray-100 bg-gray-50/30 pb-4">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <span className="relative flex size-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full size-2.5 bg-red-500" />
+                </span>
+                Feed de Alertas
+              </CardTitle>
+              <CardDescription>Eventos en tiempo real</CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 flex-1 max-h-[300px] xl:max-h-[400px] overflow-y-auto">
+              <div className="space-y-3">
+                {alerts.length === 0 ? (
+                  <div className="py-8 text-center text-sm text-gray-400 flex flex-col items-center gap-2">
+                    <CheckCircle2 className="size-8 text-gray-300" />
+                    Sin alertas recientes.
+                  </div>
+                ) : (
+                  alerts.map((a) => (
+                    <div
+                      key={a.id}
+                      className={[
+                        'rounded-xl border p-3 text-sm transition-all duration-700 shadow-sm',
+                        a.fresh
+                          ? 'border-amber-300 bg-amber-50 scale-[1.02] ring-4 ring-amber-500/10'
+                          : 'border-gray-100 bg-white hover:border-gray-200',
+                      ].join(' ')}
+                    >
+                      <p className="font-semibold text-gray-800 line-clamp-2">{a.message}</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <Badge variant="outline" className="text-[10px] py-0 px-1.5 uppercase text-gray-500 bg-gray-50 border-gray-200">{a.type}</Badge>
+                        <p className="text-[10px] text-gray-400 font-medium">{new Date(a.ts).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second:'2-digit' })}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Reports EN_REVISION */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-500" />
-            Reportes pendientes de validación
-          </CardTitle>
-          <Link to="/dashboard/reports" className="text-xs text-[#2E86C1] hover:underline">Ver todos →</Link>
+      <Card className="border-gray-200/60 shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 bg-gray-50/30 pb-4">
+          <div className="space-y-1">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <AlertTriangle className="size-5 text-amber-500" />
+              Reportes Ciudadanos por Validar
+            </CardTitle>
+            <CardDescription>Revisa la evidencia para convertirlos en sanciones</CardDescription>
+          </div>
+          <Link to="/dashboard/reports" className="text-sm font-medium text-[#2E86C1] hover:text-[#1B4F72] hover:underline">Ver panel completo</Link>
         </CardHeader>
         <CardContent className="p-0">
           {pendingReports.length === 0 ? (
-            <p className="py-6 text-center text-sm text-gray-400">No hay reportes pendientes.</p>
+            <div className="py-10 flex flex-col items-center text-gray-400">
+              <UserCheck className="size-10 mb-2 opacity-30" />
+              <p className="text-sm">Bandeja limpia. No hay reportes pendientes.</p>
+            </div>
           ) : (
             <Table>
               <Thead>
                 <Tr>
                   <Th>Tipo</Th>
                   <Th>Descripción</Th>
-                  <Th>Score</Th>
+                  <Th>Score de Fiabilidad</Th>
                   <Th>Fecha</Th>
-                  <Th>Acciones</Th>
+                  <Th className="text-right">Acciones</Th>
                 </Tr>
               </Thead>
               <Tbody>
                 {pendingReports.map((r) => (
                   <Tr key={r.id}>
                     <Td>
-                      <Badge variant="warning">
+                      <Badge variant="warning" className="whitespace-nowrap">
                         {REPORT_TYPE_LABELS[r.type] ?? r.type}
                       </Badge>
                     </Td>
-                    <Td className="max-w-xs truncate text-xs text-gray-600">
-                      {r.description ?? '—'}
+                    <Td className="max-w-[200px] truncate text-xs text-gray-600" title={r.description || ''}>
+                      {r.description ?? 'Sin descripción'}
                     </Td>
                     <Td>
-                      <span className={[
-                        'font-bold text-sm',
-                        (r.validation_score ?? 0) >= 70 ? 'text-green-600' : 'text-amber-600',
-                      ].join(' ')}>
-                        {r.validation_score ?? '—'}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full ${(r.validation_score ?? 0) >= 70 ? 'bg-emerald-500' : 'bg-amber-500'}`} 
+                            style={{ width: `${Math.min(100, r.validation_score ?? 0)}%` }}
+                          />
+                        </div>
+                        <span className={[
+                          'font-bold text-xs',
+                          (r.validation_score ?? 0) >= 70 ? 'text-emerald-600' : 'text-amber-600',
+                        ].join(' ')}>
+                          {r.validation_score ?? '0'}
+                        </span>
+                      </div>
                     </Td>
-                    <Td className="text-xs text-gray-500">{formatDate(r.created_at)}</Td>
-                    <Td>
-                      <div className="flex gap-2">
-                        <button
+                    <Td className="text-xs text-gray-500 whitespace-nowrap">{formatDate(r.created_at)}</Td>
+                    <Td className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
                           disabled={validating === r.id}
                           onClick={() => validateReport(r.id, ReportStatus.VALIDO)}
-                          className="flex items-center gap-1 rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-100 disabled:opacity-50"
+                          className="h-8 border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800"
                         >
-                          {validating === r.id ? <Spinner size="sm" /> : <CheckCircle2 className="h-3 w-3" />}
-                          Válido
-                        </button>
-                        <button
+                          {validating === r.id ? <Spinner className="size-3 mr-1" /> : <CheckCircle2 className="size-3 mr-1" />}
+                          Validar
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
                           disabled={validating === r.id}
                           onClick={() => validateReport(r.id, ReportStatus.INVALIDO)}
-                          className="flex items-center gap-1 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
+                          className="h-8 border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 hover:text-rose-800"
                         >
-                          <XCircle className="h-3 w-3" /> Inválido
-                        </button>
+                          <XCircle className="size-3 mr-1" /> Descartar
+                        </Button>
                       </div>
                     </Td>
                   </Tr>
@@ -357,41 +399,50 @@ export function FiscalDashboardPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Sanciones por nivel */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Sanciones por nivel</CardTitle>
+        <Card className="border-gray-200/60 shadow-sm">
+          <CardHeader className="border-b border-gray-100 bg-gray-50/30 pb-4">
+            <CardTitle className="text-lg">Sanciones por Nivel (Hoy)</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={sanctionBars} margin={{ top: 4, right: 8, left: -24, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="level" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#2E86C1" radius={[4, 4, 0, 0]} />
+          <CardContent className="pt-6">
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={sanctionBars} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                <XAxis dataKey="level" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} dy={10} />
+                <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip cursor={{ fill: '#f3f4f6' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                <Bar dataKey="count" fill="#2E86C1" radius={[6, 6, 0, 0]} maxBarSize={50} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         {/* Estado conductores */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Estado conductores</CardTitle>
+        <Card className="border-gray-200/60 shadow-sm">
+          <CardHeader className="border-b border-gray-100 bg-gray-50/30 pb-4">
+            <CardTitle className="text-lg">Estado Operativo de Conductores</CardTitle>
           </CardHeader>
-          <CardContent className="flex items-center justify-center">
+          <CardContent className="flex items-center justify-center pt-6">
             {driverPie.every((d) => d.value === 0) ? (
-              <p className="py-10 text-sm text-gray-400">Sin conductores registrados.</p>
+              <p className="py-16 text-sm text-gray-400">Sin conductores registrados.</p>
             ) : (
-              <ResponsiveContainer width="100%" height={200}>
+              <ResponsiveContainer width="100%" height={240}>
                 <PieChart>
-                  <Pie data={driverPie} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
+                  <Pie 
+                    data={driverPie} 
+                    cx="50%" 
+                    cy="50%" 
+                    innerRadius={70} 
+                    outerRadius={90} 
+                    paddingAngle={3} 
+                    dataKey="value"
+                    stroke="none"
+                  >
                     {driverPie.map((entry, i) => (
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip />
-                  <Legend iconType="circle" iconSize={10} formatter={(value) => <span className="text-xs">{value}</span>} />
+                  <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                  <Legend iconType="circle" iconSize={10} wrapperStyle={{ fontSize: '12px' }} />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -399,23 +450,25 @@ export function FiscalDashboardPage() {
         </Card>
       </div>
 
-      {/* Quick nav */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      {/* Quick nav blocks */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 pt-4">
         {[
-          { to: '/dashboard/sanctions', label: 'Sanciones',  Icon: ShieldAlert },
-          { to: '/dashboard/drivers',   label: 'Conductores',Icon: Activity    },
-          { to: '/dashboard/reports',   label: 'Reportes',   Icon: FileText    },
-          { to: '/dashboard/routes',    label: 'Rutas',      Icon: MapPin      },
-          { to: '/dashboard/companies', label: 'Empresas',   Icon: LayoutDashboard },
-          { to: '/dashboard/analytics', label: 'Analítica',  Icon: Clock       },
+          { to: '/dashboard/sanctions', label: 'Gestión Sanciones',  Icon: ShieldAlert },
+          { to: '/dashboard/drivers',   label: 'Directorio Choferes',Icon: Activity    },
+          { to: '/dashboard/reports',   label: 'Archivo Reportes',   Icon: FileText    },
+          { to: '/dashboard/routes',    label: 'Catálogo de Rutas',  Icon: MapPin      },
+          { to: '/dashboard/companies', label: 'Empresas Transp.',   Icon: LayoutDashboard },
+          { to: '/dashboard/analytics', label: 'Reportes y Data',    Icon: CalendarDays},
         ].map(({ to, label, Icon }) => (
           <Link
             key={to}
             to={to}
-            className="flex flex-col items-center gap-2 rounded-xl border border-gray-200 bg-white p-4 text-center hover:border-[#2E86C1] hover:bg-blue-50/30 transition-colors"
+            className="group flex flex-col items-center gap-3 rounded-xl border border-gray-200 bg-white p-5 text-center hover:border-[#2E86C1] hover:bg-blue-50/20 hover:shadow-sm transition-all"
           >
-            <Icon className="h-6 w-6 text-[#1B4F72]" />
-            <span className="text-xs font-medium text-gray-700">{label}</span>
+            <div className="p-3 bg-gray-50 rounded-full group-hover:bg-blue-100 transition-colors">
+              <Icon className="size-6 text-[#1B4F72] group-hover:text-[#2E86C1]" />
+            </div>
+            <span className="text-xs font-semibold text-gray-700 group-hover:text-gray-900">{label}</span>
           </Link>
         ))}
       </div>

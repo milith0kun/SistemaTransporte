@@ -17,11 +17,7 @@ const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
   [ReportStatus.VALIDO]:      'Válido',
   [ReportStatus.INVALIDO]:    'Inválido',
 };
-const REPORT_STATUS_COLOR: Record<ReportStatus, string> = {
-  [ReportStatus.EN_REVISION]: 'bg-amber-100 text-amber-700',
-  [ReportStatus.VALIDO]:      'bg-green-100 text-green-700',
-  [ReportStatus.INVALIDO]:    'bg-red-100 text-red-700',
-};
+
 const REPORT_TYPE_LABEL: Record<ReportType, string> = {
   [ReportType.CONDUCTOR_DIFERENTE]:  'Conductor diferente',
   [ReportType.CONDICION_VEHICULO]:   'Condición del vehículo',
@@ -60,128 +56,160 @@ export function CitizenPage() {
       {/* Primary CTA — Scan QR */}
       <button
         onClick={() => navigate('/citizen/scan')}
-        className="w-full bg-[#1B4F72] hover:bg-[#154060] active:scale-95 transition-all
-                   text-white rounded-2xl py-6 flex flex-col items-center gap-3 shadow-lg"
+        className="w-full bg-blue-700 hover:bg-blue-800 active:scale-95 transition-all
+                   text-white rounded-2xl p-6 flex items-center justify-between shadow-lg group"
       >
-        <div className="h-16 w-16 rounded-full bg-white/10 flex items-center justify-center">
-          <QrCode className="h-9 w-9" />
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+            <QrCode className="h-7 w-7" />
+          </div>
+          <div className="text-left">
+            <p className="text-xl font-bold tracking-wide">ESCANEAR QR</p>
+            <p className="text-blue-100 text-sm mt-0.5">Verificar vehículo y reportar</p>
+          </div>
         </div>
-        <div className="text-center">
-          <p className="text-xl font-bold tracking-wide">ESCANEAR QR</p>
-          <p className="text-blue-200 text-sm mt-0.5">Verificar vehículo y reportar</p>
-        </div>
+        <span className="text-white/70 text-2xl group-hover:translate-x-1 transition-transform">›</span>
       </button>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         {/* Points */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <Star className="h-5 w-5 text-amber-500" />
-            <span className="text-xs text-gray-500 font-medium">Mis puntos</span>
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 bg-amber-50 rounded-lg">
+              <Star className="h-5 w-5 text-amber-500" />
+            </div>
+            <span className="text-sm text-gray-600 font-medium">Mis puntos</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{user?.total_points ?? 0}</p>
-          <p className="text-xs text-gray-400 mt-0.5">puntos acumulados</p>
+          <p className="text-3xl font-bold text-gray-900">{user?.total_points ?? 0}</p>
+          <p className="text-xs text-gray-500 mt-1 font-medium uppercase tracking-wider">acumulados</p>
         </div>
 
         {/* Reports today */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <FileText className="h-5 w-5 text-[#2E86C1]" />
-            <span className="text-xs text-gray-500 font-medium">Hoy</span>
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <FileText className="h-5 w-5 text-blue-600" />
+            </div>
+            <span className="text-sm text-gray-600 font-medium">Hoy</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-3xl font-bold text-gray-900">
             {user?.reports_today ?? 0}
-            <span className="text-base font-normal text-gray-400">/3</span>
+            <span className="text-lg font-medium text-gray-400">/3</span>
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">reportes realizados</p>
+          <p className="text-xs text-gray-500 mt-1 font-medium uppercase tracking-wider">reportes</p>
         </div>
       </div>
 
       {/* Reputation bar */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between mb-3">
+      <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-[#1B4F72]" />
-            <span className="text-sm font-medium text-gray-700">Nivel de reputación</span>
+            <div className="p-2 bg-slate-100 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-slate-700" />
+            </div>
+            <span className="text-sm font-semibold text-gray-800">Nivel de reputación</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm font-bold text-gray-900">{reputationPct}</span>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-              reputationPct >= 80 ? 'bg-green-100 text-green-700' :
-              reputationPct >= 50 ? 'bg-amber-100 text-amber-700' :
-              'bg-red-100 text-red-700'
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold text-gray-900">{reputationPct}</span>
+            <span className={`text-xs px-2.5 py-1 rounded-full font-semibold uppercase tracking-wider ${
+              reputationPct >= 80 ? 'bg-green-100 text-green-700 border border-green-200' :
+              reputationPct >= 50 ? 'bg-amber-100 text-amber-700 border border-amber-200' :
+              'bg-red-100 text-red-700 border border-red-200'
             }`}>{repLabel}</span>
           </div>
         </div>
-        <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+        <div className="h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${repColor}`}
+            className={`h-full rounded-full transition-all duration-700 ease-out ${repColor}`}
             style={{ width: `${reputationPct}%` }}
           />
         </div>
-        <p className="text-xs text-gray-400 mt-2">
-          {reputationPct < 30
-            ? '⚠️ Reputación baja — no podrás reportar si baja de 30'
-            : 'Sigue reportando para mantener tu reputación alta'}
+        <p className="text-xs text-gray-500 mt-3 flex items-center gap-1.5">
+          {reputationPct < 30 ? (
+            <>
+              <span className="text-red-500 text-base leading-none">⚠️</span>
+              Reputación baja — no podrás reportar si baja de 30
+            </>
+          ) : (
+            'Sigue reportando con veracidad para mantener tu reputación alta'
+          )}
         </p>
       </div>
 
       {/* Ranking teaser */}
       <button
         onClick={() => navigate('/citizen/ranking')}
-        className="w-full bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-100
-                   rounded-2xl p-4 flex items-center gap-3 hover:shadow-md transition-shadow"
+        className="w-full bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200
+                   rounded-xl p-5 flex items-center gap-4 hover:shadow-md transition-all group"
       >
-        <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-          <Award className="h-5 w-5 text-amber-600" />
+        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-sm">
+          <Award className="h-6 w-6 text-white" />
         </div>
         <div className="flex-1 text-left">
-          <p className="text-sm font-semibold text-gray-800">Ver ranking municipal</p>
-          <p className="text-xs text-gray-500">Compara tus puntos con otros ciudadanos</p>
+          <p className="text-base font-bold text-gray-900">Ver ranking municipal</p>
+          <p className="text-sm text-gray-600 mt-0.5">Compara tus puntos con otros ciudadanos</p>
         </div>
-        <span className="text-gray-400 text-lg">›</span>
+        <span className="text-amber-500 text-2xl group-hover:translate-x-1 transition-transform">›</span>
       </button>
 
       {/* Last report */}
-      <div>
-        <h2 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
-          <Clock className="h-4 w-4" />
-          Último reporte
-        </h2>
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+        <div className="bg-gray-50 px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-gray-800 flex items-center gap-2 uppercase tracking-wide">
+            <Clock className="h-4 w-4 text-gray-500" />
+            Último reporte
+          </h2>
+          <button 
+            onClick={() => navigate('/citizen/reports')}
+            className="text-xs font-semibold text-blue-600 hover:text-blue-800"
+          >
+            Ver todos
+          </button>
+        </div>
 
-        {loading ? (
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 space-y-2">
-            <Skeleton className="h-4 w-1/3" />
-            <Skeleton className="h-3 w-2/3" />
-          </div>
-        ) : lastReport ? (
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">
-                  {REPORT_TYPE_LABEL[lastReport.type]}
-                </p>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {new Date(lastReport.created_at).toLocaleDateString('es-PE', {
-                    day: '2-digit', month: 'short', year: 'numeric',
-                  })}
-                </p>
-              </div>
-              <span className={`text-xs px-2 py-1 rounded-full font-medium ${REPORT_STATUS_COLOR[lastReport.status]}`}>
-                {REPORT_STATUS_LABEL[lastReport.status]}
-              </span>
+        <div className="p-5">
+          {loading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-5 w-1/3" />
+              <Skeleton className="h-4 w-2/3" />
             </div>
-            {lastReport.description && (
-              <p className="text-xs text-gray-500 mt-2 line-clamp-2">{lastReport.description}</p>
-            )}
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 text-center">
-            <p className="text-sm text-gray-400">Aún no has realizado ningún reporte.</p>
-            <p className="text-xs text-gray-400 mt-1">¡Escanea un QR para comenzar!</p>
-          </div>
-        )}
+          ) : lastReport ? (
+            <div className="group cursor-pointer hover:bg-gray-50 -m-5 p-5 transition-colors" onClick={() => navigate('/citizen/reports')}>
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="flex-1">
+                  <p className="text-base font-semibold text-gray-900">
+                    {REPORT_TYPE_LABEL[lastReport.type]}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1 flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5" />
+                    {new Date(lastReport.created_at).toLocaleDateString('es-PE', {
+                      day: '2-digit', month: 'short', year: 'numeric',
+                    })}
+                  </p>
+                </div>
+                <span className={`text-xs px-2.5 py-1 rounded-full font-semibold uppercase tracking-wider border ${
+                  lastReport.status === ReportStatus.VALIDO ? 'bg-green-50 text-green-700 border-green-200' :
+                  lastReport.status === ReportStatus.INVALIDO ? 'bg-red-50 text-red-700 border-red-200' :
+                  'bg-amber-50 text-amber-700 border-amber-200'
+                }`}>
+                  {REPORT_STATUS_LABEL[lastReport.status]}
+                </span>
+              </div>
+              {lastReport.description && (
+                <p className="text-sm text-gray-600 mt-3 line-clamp-2 leading-relaxed">{lastReport.description}</p>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <div className="h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <FileText className="h-6 w-6 text-gray-400" />
+              </div>
+              <p className="text-sm font-medium text-gray-900">Aún no has realizado ningún reporte.</p>
+              <p className="text-sm text-gray-500 mt-1">¡Escanea un QR para comenzar!</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

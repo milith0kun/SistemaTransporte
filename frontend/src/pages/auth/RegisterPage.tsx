@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Bus } from 'lucide-react';
 import api from '../../services/api';
-import { MUNICIPALITIES } from '../../lib/constants';
 import { UserRole } from '../../types';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -32,10 +31,22 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+interface Municipality {
+  id: string;
+  name: string;
+}
+
 export function RegisterPage() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
+
+  useEffect(() => {
+    api.get<Municipality[]>('/api/municipalities')
+      .then((data) => setMunicipalities(data))
+      .catch(() => console.error('Error loading municipalities'));
+  }, []);
 
   const {
     register,
@@ -107,7 +118,7 @@ export function RegisterPage() {
                       className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#2E86C1] focus:outline-none focus:ring-1 focus:ring-[#2E86C1]"
                     >
                       <option value="">Seleccione…</option>
-                      {MUNICIPALITIES.map((m) => (
+                      {municipalities.map((m) => (
                         <option key={m.id} value={m.id}>{m.name}</option>
                       ))}
                     </select>

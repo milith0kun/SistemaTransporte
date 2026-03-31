@@ -43,6 +43,9 @@ export function InspectionDetailPage() {
   const [finDerivar, setFinDerivar] = useState(action === 'infraccion');
   const [finalizing, setFinalizing] = useState(false);
 
+  // Photo upload
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
   async function load() {
     if (!id) return;
     setLoading(true);
@@ -88,6 +91,21 @@ export function InspectionDetailPage() {
       alert(e?.response?.data?.message ?? 'Error al finalizar');
     } finally {
       setFinalizing(false);
+    }
+  }
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !id) return;
+    setUploadingPhoto(true);
+    try {
+      const updated = await inspectorApi.addFoto(id, file);
+      setInspection(updated);
+    } catch (err: any) {
+      alert(err?.response?.data?.message ?? 'Error al subir foto');
+    } finally {
+      setUploadingPhoto(false);
+      e.target.value = ''; // Reset input
     }
   }
 
@@ -272,11 +290,19 @@ export function InspectionDetailPage() {
       </div>
 
       {/* Photos */}
-      {(inspection.fotos_evidencia?.length ?? 0) > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-            <Camera className="h-4 w-4" /> Fotos de Evidencia ({inspection.fotos_evidencia.length})
+      <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+            <Camera className="h-4 w-4" /> Fotos de Evidencia ({inspection.fotos_evidencia?.length ?? 0})
           </h2>
+          {isOpen && (
+            <label className={`flex items-center gap-1 text-xs text-blue-600 hover:underline cursor-pointer ${uploadingPhoto ? 'opacity-50 pointer-events-none' : ''}`}>
+              <Plus className="h-3.5 w-3.5" /> {uploadingPhoto ? 'Subiendo...' : 'Agregar Foto'}
+              <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhotoUpload} disabled={uploadingPhoto} />
+            </label>
+          )}
+        </div>
+        {(inspection.fotos_evidencia?.length ?? 0) > 0 ? (
           <div className="grid grid-cols-3 gap-2">
             {inspection.fotos_evidencia.map((url, i) => (
               <a key={i} href={url} target="_blank" rel="noreferrer">
@@ -284,8 +310,10 @@ export function InspectionDetailPage() {
               </a>
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <p className="text-sm text-gray-400 text-center py-4">Sin fotos registradas</p>
+        )}
+      </div>
 
       {/* Finalize Section */}
       {isOpen && (

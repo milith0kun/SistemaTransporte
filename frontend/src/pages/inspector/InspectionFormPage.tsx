@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, MapPin, ClipboardPlus, CheckCircle, RefreshCw,
@@ -31,6 +31,10 @@ export function InspectionFormPage() {
   const [driverId, setDriverId]   = useState<string | undefined>();
   const [vehicleErr, setVehicleErr] = useState('');
   const [driverErr, setDriverErr]   = useState('');
+
+  useEffect(() => {
+    useGeo();
+  }, []);
 
   async function resolveVehicle() {
     if (!vehiclePlate.trim()) return;

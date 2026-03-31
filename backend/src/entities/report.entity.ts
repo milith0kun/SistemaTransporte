@@ -55,6 +55,12 @@ export class Report {
   @Column({ nullable: true, length: 500 })
   photo_url: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+  latitude: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+  longitude: number;
+
   @Index()
   @Column({ type: 'enum', enum: ReportStatus, default: ReportStatus.PENDIENTE })
   status: ReportStatus;

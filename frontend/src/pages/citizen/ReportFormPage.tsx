@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Camera, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Camera, Send, CheckCircle2, AlertCircle, MapPin } from 'lucide-react';
 import api from '../../services/api';
 import { useAuthStore } from '../../stores/authStore';
 import type { Report } from '../../types';
@@ -47,6 +47,11 @@ export function ReportFormPage() {
   const [submitting, setSubmitting]     = useState(false);
   const [success, setSuccess]           = useState<{ points: number } | null>(null);
   const [apiError, setApiError]         = useState('');
+  
+  // Geolocation states
+  const [locationData, setLocationData] = useState<{lat: number, lng: number} | null>(null);
+  const [locError, setLocError] = useState('');
+
   const fileRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -64,6 +69,24 @@ export function ReportFormPage() {
 
   const description = watch('description') ?? '';
 
+  useEffect(() => {
+    if (!limitReached && "geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocationData({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (err) => {
+          console.warn("Geolocation error:", err);
+          setLocError("No se pudo obtener la ubicación GPS.");
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+  }, [limitReached]);
+
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -78,12 +101,27 @@ export function ReportFormPage() {
     setApiError('');
 
     try {
+      let photoUrl = '';
+
+      // Upload photo if present
+      if (fileRef.current?.files?.[0]) {
+        const formData = new FormData();
+        formData.append('file', fileRef.current.files[0]);
+        const uploadRes = await api.post<{url: string}>('/api/uploads/reports', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        photoUrl = uploadRes.url;
+      }
+
       await api.post<Report>('/api/reports', {
         trip_id:        tripId,
         qr_code:        qrCode,
         type:           values.type,
         description:    values.description,
         is_same_driver: isSameDriver,
+        photo_url:      photoUrl || undefined,
+        latitude:       locationData?.lat,
+        longitude:      locationData?.lng,
       });
 
       // Update user points in store
@@ -133,7 +171,7 @@ export function ReportFormPage() {
   }
 
   return (
-    <div className="px-4 py-5 max-w-lg mx-auto space-y-5">
+    <div className="px-4 py-5 max-w-lg mx-auto space-y-5 pb-24">
       <div>
         <h1 className="text-xl font-bold text-gray-900">Reportar problema</h1>
         <p className="text-sm text-gray-500 mt-0.5">
@@ -161,6 +199,18 @@ export function ReportFormPage() {
           </p>
         </div>
       )}
+
+      {locationData ? (
+        <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+          <MapPin className="h-4 w-4" />
+          Ubicación GPS adjunta al reporte
+        </div>
+      ) : locError ? (
+        <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
+          <AlertCircle className="h-4 w-4" />
+          {locError}
+        </div>
+      ) : null}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Type */}

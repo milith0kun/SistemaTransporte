@@ -5,6 +5,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Public } from '../auth/decorators/public.decorator';
 import { UserRole, User } from '../../entities';
 
 @ApiTags('municipalities')
@@ -13,6 +14,13 @@ import { UserRole, User } from '../../entities';
 @Controller('api/municipalities')
 export class MunicipalitiesController {
   constructor(private readonly service: MunicipalitiesService) {}
+
+  @Get()
+  @Public()
+  @ApiOperation({ summary: 'Obtener todas las municipalidades activas' })
+  findAll() {
+    return this.service.findAll();
+  }
 
   @Get(':id/config')
   @Roles(UserRole.ADMIN_MUNICIPAL, UserRole.FISCAL)

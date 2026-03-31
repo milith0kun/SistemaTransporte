@@ -38,8 +38,14 @@ export class Sanction {
   @Column({ type: 'text' })
   reason: string;
 
-  @Column({ type: 'jsonb', nullable: true, comment: 'Array de IDs de evidencias' })
+  @Column({ type: 'jsonb', nullable: true, comment: 'Array de URLs de evidencias' })
   evidence_ids: string[];
+
+  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+  latitude: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+  longitude: number;
 
   @Column({
     type: 'enum',
