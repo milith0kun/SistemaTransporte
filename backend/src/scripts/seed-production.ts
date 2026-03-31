@@ -122,7 +122,7 @@ async function run() {
     await ds.query(`
       INSERT INTO routes (id, origin, destination, estimated_duration_minutes, type, min_drivers,
                           rest_between_legs_hours, allows_roundtrip, municipality_id, status, created_at, updated_at)
-      VALUES (gen_random_uuid(), $1, $2, $3, 'PREDEFINIDA', $4, $5, $6, $7, 'ACTIVO', NOW(), NOW())
+      VALUES (gen_random_uuid(), $1, $2, $3, 'PREDEFINIDA', $4, $5, $6, $7, 'ACTIVA', NOW(), NOW())
       ON CONFLICT DO NOTHING
     `, [r.origin, r.dest, r.dur, r.min_d, r.rest, r.roundtrip, mId]);
   }
