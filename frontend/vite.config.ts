@@ -47,6 +47,9 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    rollupOptions: {
+      external: ['lodash', 'workbox-build'] // prevent Vite from messing with these during build in CI
+    }
   },
   server: {
     port: 5173,
