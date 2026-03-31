@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { Home, QrCode, ClipboardList, BarChart3 } from 'lucide-react';
-import { useAuthStore } from '../../stores/authStore';
+import { Home, QrCode, ClipboardList, BarChart3, LogOut } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 const tabs = [
   { to: '/inspector',              label: 'Inicio',      Icon: Home,           exact: true },
@@ -10,7 +10,7 @@ const tabs = [
 ];
 
 export function InspectorLayout() {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuth();
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -21,14 +21,23 @@ export function InspectorLayout() {
           <span className="text-xs text-blue-200 hidden sm:inline">Inspector</span>
         </div>
         {user && (
-          <div className="flex items-center gap-2">
-            <div className="flex flex-col text-right hidden sm:flex">
-              <span className="text-sm font-medium">{user.name}</span>
-              <span className="text-xs text-blue-200">{user.email}</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col text-right hidden sm:flex">
+                <span className="text-sm font-medium">{user.name}</span>
+                <span className="text-xs text-blue-200">{user.email}</span>
+              </div>
+              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
             </div>
-            <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
+            <button 
+              onClick={logout}
+              className="text-blue-200 hover:text-white transition-colors p-1"
+              title="Cerrar sesión"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
           </div>
         )}
       </header>

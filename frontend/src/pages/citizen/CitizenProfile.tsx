@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { User, Star, FileText, TrendingUp, Award } from 'lucide-react';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuth } from '../../hooks/useAuth';
 import api from '../../services/api';
 import type { Report, IncentivePoint, PaginatedResponse } from '../../types';
 import { ReportStatus, ReportType } from '../../types';
@@ -30,7 +30,7 @@ const TYPE_LABEL: Record<ReportType, string> = {
 type Tab = 'reportes' | 'puntos';
 
 export function CitizenProfile() {
-  const { user, logout } = useAuthStore();
+  const { user, logout } = useAuth();
   const [tab, setTab]           = useState<Tab>('reportes');
   const [reports, setReports]   = useState<Report[]>([]);
   const [points, setPoints]     = useState<IncentivePoint[]>([]);

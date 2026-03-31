@@ -14,7 +14,8 @@ export const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().token;
-    if (token) {
+    // Only set Authorization if it hasn't been set manually
+    if (token && !config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;

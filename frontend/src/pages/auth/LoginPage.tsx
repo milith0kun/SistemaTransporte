@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,6 +9,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Alert } from '../../components/ui/alert';
+import { ROLE_REDIRECT } from '../../lib/constants';
 
 const schema = z.object({
   email: z.string().email('Ingrese un correo válido'),
@@ -18,9 +19,16 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function LoginPage() {
-  const { login } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      navigate(ROLE_REDIRECT[user.role], { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const {
     register,

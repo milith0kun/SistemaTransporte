@@ -10,6 +10,8 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Alert } from '../../components/ui/alert';
+import { useAuth } from '../../hooks/useAuth';
+import { ROLE_REDIRECT } from '../../lib/constants';
 
 const schema = z.object({
   name: z.string().min(3, 'Mínimo 3 caracteres'),
@@ -37,10 +39,17 @@ interface Municipality {
 }
 
 export function RegisterPage() {
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      navigate(ROLE_REDIRECT[user.role], { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
     api.get<Municipality[]>('/api/municipalities')
