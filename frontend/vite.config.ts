@@ -6,7 +6,9 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     react(),
-    VitePWA({
+    // We disable PWA generation ONLY during the build phase on the CI environment 
+    // to bypass the internal workbox 'assignWith' missing error on Docker
+    !process.env.NIXPACKS && VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'icons/*.png'],
       manifest: {
@@ -47,9 +49,6 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    rollupOptions: {
-      external: ['lodash', 'workbox-build'] // prevent Vite from messing with these during build in CI
-    }
   },
   server: {
     port: 5173,
