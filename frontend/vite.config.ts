@@ -3,12 +3,14 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
+// Solo activar PWA si explícitamente se pide en entorno local o si se está seguro de no estar en Dokploy.
+// Dokploy/Nixpacks tiene un bug interno con los symlinks de node_modules al ejecutar vite-plugin-pwa
+const isCI = process.env.NIXPACKS || process.env.CI || process.env.DOKPLOY;
+
 export default defineConfig({
   plugins: [
     react(),
-    // We disable PWA generation ONLY during the build phase on the CI environment 
-    // to bypass the internal workbox 'assignWith' missing error on Docker
-    !process.env.NIXPACKS && VitePWA({
+    ...(!isCI ? [VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'icons/*.png'],
       manifest: {
@@ -41,7 +43,7 @@ export default defineConfig({
           },
         ],
       },
-    }),
+    })] : [])
   ],
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') },
