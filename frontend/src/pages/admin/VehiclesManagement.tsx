@@ -3,9 +3,18 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
-  Plus, Pencil, Trash2, Search, X, RefreshCw, QrCode,
-  Download, ChevronLeft, ChevronRight, Upload, Car,
+  Plus, Pencil, Trash2, Search, RefreshCw, QrCode,
+  Download, Upload, Car,
 } from 'lucide-react';
+import { Card, CardContent } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Badge } from '../../components/ui/badge';
+import { Modal, ModalBody, ModalFooter } from '../../components/ui/modal';
+import { Spinner } from '../../components/ui/spinner';
+import { Table, Thead, Tbody, Tr, Th, Td } from '../../components/ui/table';
+import { Select } from '../../components/ui/select';
 import { useAuthStore } from '../../stores/authStore';
 import { UserRole } from '../../types';
 
@@ -43,8 +52,7 @@ const vehicleSchema = z.object({
   plate:               z.string().regex(/^[A-Z0-9]{3}-[0-9]{3}$/, 'Formato: ABC-123'),
   brand:               z.string().max(100).optional().or(z.literal('')),
   model:               z.string().max(100).optional().or(z.literal('')),
-  year:                z.union([z.number().int().min(1990).max(new Date().getFullYear() + 1), z.nan()])
-                         .optional(),
+  year:                z.union([z.number().int().min(1990).max(new Date().getFullYear() + 1), z.nan()]).optional(),
   color:               z.string().max(50).optional().or(z.literal('')),
   capacity:            z.union([z.number().int().min(1).max(100), z.nan()]).optional(),
   photo_url:           z.string().optional().or(z.literal('')),
@@ -59,7 +67,7 @@ type VehicleFormData = z.infer<typeof vehicleSchema>;
 const STATUS_COLORS: Record<VehicleStatus, string> = {
   ACTIVO:       'bg-green-100 text-green-800',
   INACTIVO:     'bg-gray-100 text-gray-600',
-  MANTENIMIENTO:'bg-yellow-100 text-yellow-800',
+  MANTENIMIENTO:'bg-amber-100 text-amber-800',
 };
 
 function statusLabel(s: VehicleStatus) {
@@ -75,7 +83,7 @@ function expiryClass(d?: string) {
   if (!d) return '';
   const diff = (new Date(d + 'T00:00:00').getTime() - Date.now()) / 86400000;
   if (diff < 0)  return 'text-red-600 font-semibold';
-  if (diff < 30) return 'text-yellow-600 font-semibold';
+  if (diff < 30) return 'text-amber-600 font-semibold';
   return 'text-gray-600';
 }
 
@@ -145,7 +153,6 @@ function QrModal({ vehicle, onClose }: { vehicle: Vehicle; onClose: () => void }
   const loadQr = useCallback(async () => {
     setLoading(true);
     setError('');
-    // Revoke previous blob URL to avoid memory leaks
     setQrData(prev => { if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev); return null; });
     try {
       const res = await fetch(`/api/vehicles/${vehicle.id}/qr`, { headers: { Authorization: `Bearer ${token}` } });
@@ -177,7 +184,6 @@ function QrModal({ vehicle, onClose }: { vehicle: Vehicle; onClose: () => void }
 
   async function handleDownload() {
     if (!qrData) return;
-    // Re-fetch for a clean download so we don't rely on the existing blob URL state
     const res = await fetch(`/api/vehicles/${vehicle.id}/qr`, { headers: { Authorization: `Bearer ${token}` } });
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
@@ -189,62 +195,42 @@ function QrModal({ vehicle, onClose }: { vehicle: Vehicle; onClose: () => void }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm">
-        <div className="flex items-center justify-between px-5 py-4 border-b">
-          <div>
-            <h2 className="text-base font-semibold text-gray-900">Código QR</h2>
-            <p className="text-sm text-gray-500">{vehicle.plate} — {vehicle.brand} {vehicle.model}</p>
+    <Modal open={true} onClose={onClose} title="Código QR" size="sm">
+      <ModalBody className="flex flex-col items-center gap-4">
+        <p className="text-sm text-gray-500 w-full text-center border-b pb-4 mb-2">{vehicle.plate} — {vehicle.brand} {vehicle.model}</p>
+        {loading ? (
+          <div className="h-56 flex items-center justify-center">
+            <RefreshCw className="h-8 w-8 text-[#2E86C1] animate-spin" />
           </div>
-          <button onClick={onClose} className="p-1 rounded hover:bg-gray-100"><X className="h-5 w-5 text-gray-500" /></button>
-        </div>
-
-        <div className="p-5 flex flex-col items-center gap-4">
-          {loading ? (
-            <div className="h-56 flex items-center justify-center">
-              <RefreshCw className="h-8 w-8 text-blue-500 animate-spin" />
-            </div>
-          ) : error ? (
-            <div className="h-56 flex flex-col items-center justify-center gap-2">
-              <p className="text-sm text-red-600">{error}</p>
-              <button onClick={loadQr} className="text-sm text-blue-600 hover:underline">Reintentar</button>
-            </div>
-          ) : qrData ? (
-            <img src={qrData} alt="QR Code" className="w-56 h-56 rounded-lg border border-gray-200" />
-          ) : (
-            <div className="h-56 flex items-center justify-center">
-              <p className="text-sm text-gray-500">QR no disponible</p>
-            </div>
-          )}
-
-          <div className="flex gap-2 w-full">
-            <button
-              onClick={handleDownload}
-              disabled={!qrData || loading}
-              className="flex-1 flex items-center justify-center gap-1.5 text-sm py-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
-            >
-              <Download className="h-4 w-4" /> Descargar
-            </button>
-            <button
-              onClick={handleRegenerate}
-              disabled={regenerating || loading}
-              className="flex-1 flex items-center justify-center gap-1.5 text-sm py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
-            >
-              {regenerating
-                ? <><RefreshCw className="h-4 w-4 animate-spin" /> Regenerando…</>
-                : <><RefreshCw className="h-4 w-4" /> Regenerar QR</>}
-            </button>
+        ) : error ? (
+          <div className="h-56 flex flex-col items-center justify-center gap-2">
+            <p className="text-sm text-red-600">{error}</p>
+            <Button variant="link" onClick={loadQr}>Reintentar</Button>
           </div>
-        </div>
-      </div>
-    </div>
+        ) : qrData ? (
+          <img src={qrData} alt="QR Code" className="w-56 h-56 rounded-lg border border-gray-200" />
+        ) : (
+          <div className="h-56 flex items-center justify-center">
+            <p className="text-sm text-gray-500">QR no disponible</p>
+          </div>
+        )}
+      </ModalBody>
+      <ModalFooter className="flex gap-2 w-full justify-center sm:justify-between">
+        <Button variant="outline" className="flex-1" onClick={handleDownload} disabled={!qrData || loading}>
+          <Download className="h-4 w-4 mr-1.5" /> Descargar
+        </Button>
+        <Button className="flex-1" onClick={handleRegenerate} disabled={regenerating || loading}>
+          {regenerating ? <><Spinner className="h-4 w-4 mr-1.5" /> Regenerando…</> : <><RefreshCw className="h-4 w-4 mr-1.5" /> Regenerar QR</>}
+        </Button>
+      </ModalFooter>
+    </Modal>
   );
 }
 
 /* ── Main component ──────────────────────────────────────────────────────── */
 export function VehiclesManagement() {
   const { user, token } = useAuthStore();
-  const canEdit = user?.role === UserRole.ADMIN_MUNICIPAL;
+  const canEdit = user?.role === UserRole.ADMIN_MUNICIPAL || user?.role === UserRole.OPERADOR_EMPRESA;
 
   const [vehicles, setVehicles]     = useState<Vehicle[]>([]);
   const [total, setTotal]           = useState(0);
@@ -298,12 +284,6 @@ export function VehiclesManagement() {
 
   useEffect(() => { load(); }, [load]);
 
-  function applyFilters() { setPage(1); load(1); }
-  function clearFilters() {
-    setSearch(''); setFilterStatus(''); setFilterCompany('');
-    setPage(1);
-  }
-
   /* ── Delete ── */
   async function confirmDelete() {
     if (!deleteVehicle) return;
@@ -319,239 +299,157 @@ export function VehiclesManagement() {
 
   const totalPages = Math.ceil(total / LIMIT);
 
-  /* ─────────────────────────────────── */
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Gestión de Vehículos</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            {total} vehículo{total !== 1 ? 's' : ''} registrado{total !== 1 ? 's' : ''}
-          </p>
+        <div className="flex items-center gap-2">
+          <Car className="h-6 w-6 text-[#1B4F72]" />
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Gestión de Vehículos</h2>
+            <p className="text-sm text-gray-500">Administra el parque automotor y sus estados</p>
+          </div>
         </div>
         {canEdit && (
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm"
-          >
-            <Plus className="h-4 w-4" /> Nuevo Vehículo
-          </button>
+          <Button onClick={() => setShowCreate(true)} size="sm">
+            <Plus className="h-4 w-4 mr-1.5" /> Nuevo Vehículo
+          </Button>
         )}
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-wrap gap-3 items-end">
-        <div className="flex-1 min-w-[200px]">
-          <label className="text-xs font-medium text-gray-600 mb-1 block">Buscar (placa, marca, modelo)</label>
-          <div className="relative">
+      <Card>
+        <CardContent className="flex flex-wrap gap-3 pt-5 items-end">
+          <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              placeholder="Ej: ABC-123 o Toyota"
+            <Input
+              placeholder="Buscar por placa, marca o modelo…"
+              className="pl-9"
               value={search}
-              onChange={e => setSearch(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && applyFilters()}
+              onChange={e => { setSearch(e.target.value); setPage(1); }}
             />
           </div>
-        </div>
-        <div className="w-40">
-          <label className="text-xs font-medium text-gray-600 mb-1 block">Estado</label>
-          <select
-            className="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-            value={filterStatus}
-            onChange={e => setFilterStatus(e.target.value)}
-          >
-            <option value="">Todos</option>
-            <option value="ACTIVO">Activo</option>
-            <option value="INACTIVO">Inactivo</option>
-            <option value="MANTENIMIENTO">Mantenimiento</option>
-          </select>
-        </div>
-        <div className="w-48">
-          <label className="text-xs font-medium text-gray-600 mb-1 block">Empresa</label>
-          <select
-            className="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-            value={filterCompany}
-            onChange={e => setFilterCompany(e.target.value)}
-          >
-            <option value="">Todas</option>
+          <Select value={filterStatus} onChange={e => { setFilterStatus(e.target.value); setPage(1); }} className="min-w-[160px]">
+            <option value="">Todos los estados</option>
+            <option value="ACTIVO">ACTIVO</option>
+            <option value="INACTIVO">INACTIVO</option>
+            <option value="MANTENIMIENTO">MANTENIMIENTO</option>
+          </Select>
+          <Select value={filterCompany} onChange={e => { setFilterCompany(e.target.value); setPage(1); }} className="min-w-[180px]">
+            <option value="">Todas las empresas</option>
             {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </div>
-        <button onClick={applyFilters}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
-          Filtrar
-        </button>
-        {(search || filterStatus || filterCompany) && (
-          <button onClick={clearFilters}
-            className="px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <X className="h-4 w-4" />
-          </button>
-        )}
-      </div>
+          </Select>
+        </CardContent>
+      </Card>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Vehículo</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Placa</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Capacidad</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">SOAT</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Rev. Técnica</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Empresa</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Estado</th>
-                <th className="text-right px-4 py-3 font-medium text-gray-600">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {loading ? (
-                <tr><td colSpan={8} className="text-center py-12 text-gray-400">Cargando…</td></tr>
-              ) : vehicles.length === 0 ? (
-                <tr><td colSpan={8} className="text-center py-12 text-gray-400">No hay vehículos registrados</td></tr>
-              ) : vehicles.map(v => (
-                <tr key={v.id} className="hover:bg-gray-50 transition-colors">
-                  {/* Vehicle photo + info */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-10 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center border border-gray-200 shrink-0">
-                        {v.photo_url
-                          ? <img src={v.photo_url} alt={v.plate} className="w-full h-full object-cover" />
-                          : <Car className="h-5 w-5 text-gray-400" />}
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {[v.brand, v.model].filter(Boolean).join(' ') || '—'}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {v.year ?? ''}{v.color ? ` · ${v.color}` : ''}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="font-mono font-semibold text-gray-800 tracking-wider">{v.plate}</span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-700">
-                    {v.capacity ? `${v.capacity} pas.` : '—'}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={expiryClass(v.soat_expires_at)}>{fmtDate(v.soat_expires_at)}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={expiryClass(v.inspection_expires_at)}>{fmtDate(v.inspection_expires_at)}</span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-700">{v.company?.name ?? '—'}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[v.status]}`}>
-                      {statusLabel(v.status)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        onClick={() => setQrVehicle(v)}
-                        title="Ver QR"
-                        className="p-1.5 rounded hover:bg-blue-50 text-blue-600 hover:text-blue-800"
-                      >
-                        <QrCode className="h-4 w-4" />
-                      </button>
-                      {canEdit && (
-                        <>
-                          <button
-                            onClick={() => setEditVehicle(v)}
-                            title="Editar"
-                            className="p-1.5 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-700"
-                          >
-                            <Pencil className="h-4 w-4" />
+      <Card>
+        <CardContent className="p-0">
+          {loading ? (
+             <div className="flex justify-center py-12"><Spinner /></div>
+          ) : (
+            <>
+              <Table>
+                <Thead>
+                  <Tr>
+                    <Th>Vehículo</Th>
+                    <Th>Placa</Th>
+                    <Th>Empresa</Th>
+                    <Th>Capacidad</Th>
+                    <Th>SOAT</Th>
+                    <Th>Rev. Técnica</Th>
+                    <Th>Estado</Th>
+                    <Th></Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {vehicles.length === 0 ? (
+                    <Tr><Td colSpan={8} className="py-12 text-center text-gray-400">Sin vehículos registrados.</Td></Tr>
+                  ) : vehicles.map(v => (
+                    <Tr key={v.id}>
+                      <Td>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center border border-gray-200 shrink-0">
+                            {v.photo_url
+                              ? <img src={v.photo_url} alt={v.plate} className="w-full h-full object-cover" />
+                              : <Car className="h-5 w-5 text-gray-400" />}
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              {[v.brand, v.model].filter(Boolean).join(' ') || '—'}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {v.year ?? ''}{v.color ? ` · ${v.color}` : ''}
+                            </p>
+                          </div>
+                        </div>
+                      </Td>
+                      <Td className="font-mono font-semibold text-gray-800 tracking-wider">{v.plate}</Td>
+                      <Td className="text-gray-600">{v.company?.name ?? '—'}</Td>
+                      <Td className="text-gray-600">{v.capacity ? `${v.capacity} pas.` : '—'}</Td>
+                      <Td><span className={`text-sm ${expiryClass(v.soat_expires_at)}`}>{fmtDate(v.soat_expires_at)}</span></Td>
+                      <Td><span className={`text-sm ${expiryClass(v.inspection_expires_at)}`}>{fmtDate(v.inspection_expires_at)}</span></Td>
+                      <Td><Badge className={`${STATUS_COLORS[v.status]} text-xs`}>{statusLabel(v.status)}</Badge></Td>
+                      <Td>
+                        <div className="flex items-center justify-end gap-1">
+                          <button onClick={() => setQrVehicle(v)} title="Ver QR" className="p-1.5 rounded hover:bg-blue-50 text-blue-600">
+                            <QrCode className="h-4 w-4" />
                           </button>
-                          <button
-                            onClick={() => setDeleteVehicle(v)}
-                            title="Eliminar"
-                            className="p-1.5 rounded hover:bg-red-50 text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                          {canEdit && (
+                            <>
+                              <button onClick={() => setEditVehicle(v)} className="p-1.5 rounded hover:bg-gray-100 text-gray-500">
+                                <Pencil className="h-4 w-4" />
+                              </button>
+                              <button onClick={() => setDeleteVehicle(v)} className="p-1.5 rounded hover:bg-red-50 text-red-500">
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50">
-            <p className="text-sm text-gray-600">
-              Página {page} de {totalPages} · {total} vehículos
-            </p>
-            <div className="flex gap-1">
-              <button onClick={() => { setPage(p => p - 1); }}
-                disabled={page === 1}
-                className="p-1.5 rounded border border-gray-300 disabled:opacity-40 hover:bg-gray-100">
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button onClick={() => { setPage(p => p + 1); }}
-                disabled={page === totalPages}
-                className="p-1.5 rounded border border-gray-300 disabled:opacity-40 hover:bg-gray-100">
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
+                  <p className="text-sm text-gray-500">{total} vehículo{total !== 1 ? 's' : ''} · pág. {page}/{totalPages}</p>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" disabled={page === 1}     onClick={() => setPage(p => p - 1)}>Anterior</Button>
+                    <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Siguiente</Button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
 
-      {/* QR Modal */}
+      {/* Modals */}
       {qrVehicle && <QrModal vehicle={qrVehicle} onClose={() => setQrVehicle(null)} />}
-
-      {/* Create Modal */}
+      
       {showCreate && (
-        <VehicleFormModal
-          mode="create"
-          companies={companies}
-          onClose={() => setShowCreate(false)}
-          onSaved={() => { setShowCreate(false); load(); }}
-        />
+        <VehicleFormModal mode="create" companies={companies} onClose={() => setShowCreate(false)} onSaved={() => { setShowCreate(false); load(); }} />
       )}
 
-      {/* Edit Modal */}
       {editVehicle && (
-        <VehicleFormModal
-          mode="edit"
-          vehicle={editVehicle}
-          companies={companies}
-          onClose={() => setEditVehicle(null)}
-          onSaved={() => { setEditVehicle(null); load(); }}
-        />
+        <VehicleFormModal mode="edit" vehicle={editVehicle} companies={companies} onClose={() => setEditVehicle(null)} onSaved={() => { setEditVehicle(null); load(); }} />
       )}
 
-      {/* Delete Modal */}
-      {deleteVehicle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6">
-            <h2 className="text-base font-semibold text-gray-900 mb-2">Eliminar Vehículo</h2>
-            <p className="text-sm text-gray-600 mb-5">
-              ¿Eliminar <strong>{deleteVehicle.plate}</strong>? Esta acción no se puede deshacer.
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button onClick={() => setDeleteVehicle(null)}
-                className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
-                Cancelar
-              </button>
-              <button onClick={confirmDelete} disabled={deleting}
-                className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
-                {deleting ? 'Eliminando…' : 'Eliminar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal open={!!deleteVehicle} onClose={() => setDeleteVehicle(null)} title="Eliminar Vehículo" size="sm">
+        <ModalBody>
+          <p className="text-sm text-gray-700">
+            ¿Eliminar <strong>{deleteVehicle?.plate}</strong>? Esta acción no se puede deshacer.
+          </p>
+        </ModalBody>
+        <ModalFooter>
+          <Button variant="outline" onClick={() => setDeleteVehicle(null)}>Cancelar</Button>
+          <Button className="bg-red-600 hover:bg-red-700" onClick={confirmDelete} disabled={deleting}>
+            {deleting ? <Spinner className="h-4 w-4" /> : 'Eliminar'}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 }
@@ -567,10 +465,7 @@ function VehicleFormModal({
   onSaved: () => void;
 }) {
   const { token } = useAuthStore();
-  const {
-    register, handleSubmit, setValue, watch,
-    formState: { errors, isSubmitting },
-  } = useForm<VehicleFormData>({
+  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<VehicleFormData>({
     resolver: zodResolver(vehicleSchema),
     defaultValues: {
       plate:               vehicle?.plate ?? '',
@@ -618,116 +513,88 @@ function VehicleFormModal({
     }
   }
 
-  const inputCls = (hasErr: boolean) =>
-    `w-full px-3 py-2 text-sm border rounded-lg outline-none transition focus:ring-2 focus:ring-blue-500 ${
-      hasErr ? 'border-red-400 bg-red-50' : 'border-gray-300'}`;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl my-8">
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-base font-semibold text-gray-900">
-            {mode === 'create' ? 'Nuevo Vehículo' : `Editar ${vehicle?.plate}`}
-          </h2>
-          <button onClick={onClose} className="p-1 rounded hover:bg-gray-100"><X className="h-5 w-5 text-gray-500" /></button>
-        </div>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-5">
-          {/* Photo */}
+    <Modal open={true} onClose={onClose} title={mode === 'create' ? 'Nuevo Vehículo' : `Editar ${vehicle?.plate}`} size="lg">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <ModalBody className="space-y-5">
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-2">Fotografía del Vehículo</label>
-            <PhotoUpload
-              value={photoUrl || undefined}
-              onChange={url => setValue('photo_url', url)}
-            />
+            <Label className="mb-2 block">Fotografía del Vehículo</Label>
+            <PhotoUpload value={photoUrl || undefined} onChange={url => setValue('photo_url', url)} />
           </div>
 
-          {/* Row: plate + company */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Placa *</label>
-              <input {...register('plate')} placeholder="ABC-123"
-                className={`${inputCls(!!errors.plate)} uppercase`} />
-              {errors.plate && <p className="text-xs text-red-500 mt-1">{errors.plate.message}</p>}
+            <div className="space-y-1.5">
+              <Label>Placa *</Label>
+              <Input {...register('plate')} placeholder="ABC-123" className="uppercase" />
+              {errors.plate && <p className="text-xs text-red-500">{errors.plate.message}</p>}
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Empresa *</label>
-              <select {...register('company_id')} className={inputCls(!!errors.company_id)}>
+            <div className="space-y-1.5">
+              <Label>Empresa *</Label>
+              <Select {...register('company_id')}>
                 <option value="">Seleccionar empresa…</option>
                 {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-              {errors.company_id && <p className="text-xs text-red-500 mt-1">{errors.company_id.message}</p>}
+              </Select>
+              {errors.company_id && <p className="text-xs text-red-500">{errors.company_id.message}</p>}
             </div>
           </div>
 
-          {/* Row: brand + model */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Marca</label>
-              <input {...register('brand')} placeholder="Toyota, Mercedes…" className={inputCls(!!errors.brand)} />
+            <div className="space-y-1.5">
+              <Label>Marca</Label>
+              <Input {...register('brand')} placeholder="Toyota, Mercedes…" />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Modelo</label>
-              <input {...register('model')} placeholder="Coaster, Sprinter…" className={inputCls(!!errors.model)} />
+            <div className="space-y-1.5">
+              <Label>Modelo</Label>
+              <Input {...register('model')} placeholder="Coaster, Sprinter…" />
             </div>
           </div>
 
-          {/* Row: year + color + capacity */}
           <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Año</label>
-              <input {...register('year', { valueAsNumber: true })} type="number"
-                min={1990} max={new Date().getFullYear() + 1} placeholder="2020"
-                className={inputCls(!!errors.year)} />
+            <div className="space-y-1.5">
+              <Label>Año</Label>
+              <Input {...register('year', { valueAsNumber: true })} type="number" min={1990} max={new Date().getFullYear() + 1} placeholder="2020" />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Color</label>
-              <input {...register('color')} placeholder="Blanco" className={inputCls(!!errors.color)} />
+            <div className="space-y-1.5">
+              <Label>Color</Label>
+              <Input {...register('color')} placeholder="Blanco" />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Capacidad</label>
-              <input {...register('capacity', { valueAsNumber: true })} type="number"
-                min={1} max={100} placeholder="20"
-                className={inputCls(!!errors.capacity)} />
-              {errors.capacity && <p className="text-xs text-red-500 mt-1">{errors.capacity.message}</p>}
+            <div className="space-y-1.5">
+              <Label>Capacidad</Label>
+              <Input {...register('capacity', { valueAsNumber: true })} type="number" min={1} max={100} placeholder="20" />
+              {errors.capacity && <p className="text-xs text-red-500">{errors.capacity.message}</p>}
             </div>
           </div>
 
-          {/* Row: soat + inspection + status */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Venc. SOAT</label>
-              <input {...register('soat_expires_at')} type="date" className={inputCls(!!errors.soat_expires_at)} />
+            <div className="space-y-1.5">
+              <Label>Vencimiento SOAT</Label>
+              <Input {...register('soat_expires_at')} type="date" />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Venc. Rev. Técnica</label>
-              <input {...register('inspection_expires_at')} type="date" className={inputCls(!!errors.inspection_expires_at)} />
+            <div className="space-y-1.5">
+              <Label>Vencimiento Rev. Técnica</Label>
+              <Input {...register('inspection_expires_at')} type="date" />
             </div>
             {mode === 'edit' && (
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Estado</label>
-                <select {...register('status')} className={inputCls(!!errors.status)}>
+              <div className="space-y-1.5">
+                <Label>Estado</Label>
+                <Select {...register('status')}>
                   <option value="ACTIVO">Activo</option>
                   <option value="INACTIVO">Inactivo</option>
                   <option value="MANTENIMIENTO">Mantenimiento</option>
-                </select>
+                </Select>
               </div>
             )}
           </div>
-
-          {/* Actions */}
-          <div className="flex gap-3 justify-end pt-2 border-t border-gray-100">
-            <button type="button" onClick={onClose}
-              className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
-              Cancelar
-            </button>
-            <button type="submit" disabled={isSubmitting}
-              className="px-5 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium">
-              {isSubmitting ? 'Guardando…' : mode === 'create' ? 'Crear Vehículo' : 'Guardar Cambios'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <Spinner className="h-4 w-4 mr-1.5" /> : null}
+            {mode === 'create' ? 'Crear Vehículo' : 'Guardar Cambios'}
+          </Button>
+        </ModalFooter>
+      </form>
+    </Modal>
   );
 }
+

@@ -127,17 +127,19 @@ function CompanyRow({ company, onEdit, onDelete }: { company: Company; onEdit: (
                   </p>
                   {!drivers?.length ? <p className="text-xs text-gray-400 py-2">Sin conductores.</p> : (
                     <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
-                      <table className="min-w-full text-sm divide-y divide-gray-100">
-                        <thead className="bg-gray-50"><tr>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Nombre</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">DNI</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Estado</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Rep.</th>
-                        </tr></thead>
-                        <tbody className="divide-y divide-gray-50">
+                      <Table>
+                        <Thead>
+                          <Tr>
+                            <Th className="px-3 py-2 text-xs">Nombre</Th>
+                            <Th className="px-3 py-2 text-xs">DNI</Th>
+                            <Th className="px-3 py-2 text-xs">Estado</Th>
+                            <Th className="px-3 py-2 text-xs">Rep.</Th>
+                          </Tr>
+                        </Thead>
+                        <Tbody className="divide-y divide-gray-50">
                           {drivers.map(d => (
-                            <tr key={d.id} className="hover:bg-gray-50">
-                              <td className="px-3 py-2">
+                            <Tr key={d.id} className="hover:bg-gray-50">
+                              <Td className="px-3 py-2">
                                 <div className="flex items-center gap-2">
                                   {d.photo_url
                                     ? <img src={d.photo_url} alt="" className="h-7 w-7 rounded-full object-cover flex-shrink-0" />
@@ -145,14 +147,14 @@ function CompanyRow({ company, onEdit, onDelete }: { company: Company; onEdit: (
                                   }
                                   <span className="font-medium text-gray-800">{d.name}</span>
                                 </div>
-                              </td>
-                              <td className="px-3 py-2 text-gray-500 font-mono text-xs">{d.dni}</td>
-                              <td className="px-3 py-2"><Badge className={`${DRIVER_BADGE[d.status]} text-xs`}>{d.status}</Badge></td>
-                              <td className="px-3 py-2"><RepBar score={d.reputation_score} /></td>
-                            </tr>
+                              </Td>
+                              <Td className="px-3 py-2 text-gray-500 font-mono text-xs">{d.dni}</Td>
+                              <Td className="px-3 py-2"><Badge className={`${DRIVER_BADGE[d.status]} text-xs`}>{d.status}</Badge></Td>
+                              <Td className="px-3 py-2"><RepBar score={d.reputation_score} /></Td>
+                            </Tr>
                           ))}
-                        </tbody>
-                      </table>
+                        </Tbody>
+                      </Table>
                     </div>
                   )}
                 </div>
@@ -163,24 +165,26 @@ function CompanyRow({ company, onEdit, onDelete }: { company: Company; onEdit: (
                   </p>
                   {!vehicles?.length ? <p className="text-xs text-gray-400 py-2">Sin vehículos.</p> : (
                     <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
-                      <table className="min-w-full text-sm divide-y divide-gray-100">
-                        <thead className="bg-gray-50"><tr>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Placa</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Vehículo</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Estado</th>
-                        </tr></thead>
-                        <tbody className="divide-y divide-gray-50">
+                      <Table>
+                        <Thead>
+                          <Tr>
+                            <Th className="px-3 py-2 text-xs">Placa</Th>
+                            <Th className="px-3 py-2 text-xs">Vehículo</Th>
+                            <Th className="px-3 py-2 text-xs">Estado</Th>
+                          </Tr>
+                        </Thead>
+                        <Tbody className="divide-y divide-gray-50">
                           {vehicles.map(v => (
-                            <tr key={v.id} className="hover:bg-gray-50">
-                              <td className="px-3 py-2 font-mono font-semibold text-gray-800">{v.plate}</td>
-                              <td className="px-3 py-2 text-gray-500 text-xs">{[v.brand, v.model].filter(Boolean).join(' ') || '—'}</td>
-                              <td className="px-3 py-2">
+                            <Tr key={v.id} className="hover:bg-gray-50">
+                              <Td className="px-3 py-2 font-mono font-semibold text-gray-800">{v.plate}</Td>
+                              <Td className="px-3 py-2 text-gray-500 text-xs">{[v.brand, v.model].filter(Boolean).join(' ') || '—'}</Td>
+                              <Td className="px-3 py-2">
                                 <Badge className={v.status === 'ACTIVO' ? 'bg-green-100 text-green-800 text-xs' : 'bg-gray-100 text-gray-600 text-xs'}>{v.status}</Badge>
-                              </td>
-                            </tr>
+                              </Td>
+                            </Tr>
                           ))}
-                        </tbody>
-                      </table>
+                        </Tbody>
+                      </Table>
                     </div>
                   )}
                 </div>

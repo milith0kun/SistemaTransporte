@@ -46,7 +46,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col justify-center bg-gradient-to-br from-blue-50 via-slate-50 to-blue-100 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Title & Logo */}
         <div className="text-center mb-8">
@@ -59,7 +59,7 @@ export function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white py-8 px-6 shadow-sm border border-slate-200 sm:rounded-2xl sm:px-10">
+        <div className="bg-white py-8 px-6 shadow-xl shadow-blue-900/5 border border-slate-100 sm:rounded-2xl sm:px-10 backdrop-blur-sm bg-white/95">
           <h2 className="text-xl font-semibold text-slate-900 mb-6 text-center">Acceder a tu cuenta</h2>
 
           {error && (

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Play, Square, RefreshCw } from 'lucide-react';
+import { Plus, Play, Square, RefreshCw, Route } from 'lucide-react';
 import api from '../../services/api';
 import { Trip, TripStatus, PaginatedResponse } from '../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
@@ -79,12 +79,15 @@ export function TripsListPage() {
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900">Viajes</h2>
-          <p className="text-sm text-gray-500">{total} viaje(s) en total</p>
+        <div className="flex items-center gap-2">
+          <Route className="h-6 w-6 text-[#1B4F72]" />
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Viajes</h2>
+            <p className="text-sm text-gray-500">{total} viaje(s) en total</p>
+          </div>
         </div>
         <Link to="/operator/trips/new">
           <Button className="flex items-center gap-2">
@@ -97,12 +100,12 @@ export function TripsListPage() {
 
       {/* Filters */}
       <Card>
-        <CardContent className="pt-4 pb-4">
-          <div className="flex flex-wrap gap-3">
+        <CardContent className="pt-5">
+          <div className="flex flex-wrap items-center gap-3">
             <select
               value={filterStatus}
               onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }}
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-[#2E86C1] focus:outline-none focus:ring-1 focus:ring-[#2E86C1]"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#2E86C1] focus:outline-none focus:ring-1 focus:ring-[#2E86C1] min-w-[160px]"
             >
               <option value="">Todos los estados</option>
               {Object.entries(STATUS_STYLES).map(([k, v]) => (
@@ -113,19 +116,21 @@ export function TripsListPage() {
               type="date"
               value={filterDateFrom}
               onChange={(e) => { setFilterDateFrom(e.target.value); setPage(1); }}
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-[#2E86C1] focus:outline-none focus:ring-1 focus:ring-[#2E86C1]"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#2E86C1] focus:outline-none focus:ring-1 focus:ring-[#2E86C1]"
+              title="Desde"
             />
             <input
               type="date"
               value={filterDateTo}
               onChange={(e) => { setFilterDateTo(e.target.value); setPage(1); }}
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-[#2E86C1] focus:outline-none focus:ring-1 focus:ring-[#2E86C1]"
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#2E86C1] focus:outline-none focus:ring-1 focus:ring-[#2E86C1]"
+              title="Hasta"
             />
             <button
               onClick={() => { setFilterStatus(''); setFilterDateFrom(''); setFilterDateTo(''); setPage(1); }}
-              className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+              className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#2E86C1] transition-colors"
             >
-              <RefreshCw className="h-3.5 w-3.5" /> Limpiar
+              <RefreshCw className="h-4 w-4" /> Limpiar
             </button>
           </div>
         </CardContent>
@@ -192,14 +197,16 @@ export function TripsListPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-            Anterior
-          </Button>
+        <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-4 px-1">
           <span className="text-sm text-gray-500">Página {page} de {totalPages}</span>
-          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-            Siguiente
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+              Anterior
+            </Button>
+            <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+              Siguiente
+            </Button>
+          </div>
         </div>
       )}
 

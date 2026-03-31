@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { QrCode, Download, RefreshCw } from 'lucide-react';
+import { QrCode, Download, RefreshCw, Car } from 'lucide-react';
 import api from '../../services/api';
 import { Vehicle, PaginatedResponse } from '../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
@@ -75,21 +75,24 @@ export function VehiclesListPage() {
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
-    <div className="space-y-5">
-      <div>
-        <h2 className="text-xl font-bold text-gray-900">Vehículos</h2>
-        <p className="text-sm text-gray-500">{total} vehículo(s) en total</p>
+    <div className="space-y-6">
+      <div className="flex items-center gap-2">
+        <Car className="h-6 w-6 text-[#1B4F72]" />
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Vehículos</h2>
+          <p className="text-sm text-gray-500">{total} vehículo(s) en total</p>
+        </div>
       </div>
 
       {error && <Alert variant="error">{error}</Alert>}
 
       {/* Filters */}
       <Card>
-        <CardContent className="flex flex-wrap items-center gap-3 pt-4 pb-4">
+        <CardContent className="flex flex-wrap items-center gap-3 pt-5">
           <select
             value={filterStatus}
             onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-[#2E86C1] focus:outline-none focus:ring-1 focus:ring-[#2E86C1]"
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#2E86C1] focus:outline-none focus:ring-1 focus:ring-[#2E86C1] min-w-[180px]"
           >
             <option value="">Todos los estados</option>
             <option value="ACTIVO">Activo</option>
@@ -98,9 +101,9 @@ export function VehiclesListPage() {
           </select>
           <button
             onClick={() => { setFilterStatus(''); setPage(1); }}
-            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#2E86C1] transition-colors"
           >
-            <RefreshCw className="h-3.5 w-3.5" /> Limpiar
+            <RefreshCw className="h-4 w-4" /> Limpiar
           </button>
         </CardContent>
       </Card>
@@ -164,22 +167,24 @@ export function VehiclesListPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <button
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-40 hover:bg-gray-50"
-          >
-            Anterior
-          </button>
+        <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-4 px-1">
           <span className="text-sm text-gray-500">Página {page} de {totalPages}</span>
-          <button
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-40 hover:bg-gray-50"
-          >
-            Siguiente
-          </button>
+          <div className="flex gap-2">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-40 hover:bg-gray-50"
+            >
+              Anterior
+            </button>
+            <button
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-40 hover:bg-gray-50"
+            >
+              Siguiente
+            </button>
+          </div>
         </div>
       )}
 

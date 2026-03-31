@@ -105,13 +105,18 @@ export function InspectorDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Panel de Inspección</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Actividad del día en tu municipalidad</p>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#1B4F72]/10 rounded-lg">
+            <ClipboardCheck className="w-6 h-6 text-[#1B4F72]" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Panel de Inspección</h2>
+            <p className="text-sm text-gray-500">Actividad del día en tu municipalidad</p>
+          </div>
         </div>
-        <button onClick={load} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50">
-          <RefreshCw className="h-4 w-4 text-gray-500" />
+        <button onClick={load} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 transition-colors" title="Actualizar datos">
+          <RefreshCw className="h-4 w-4" />
         </button>
       </div>
 
@@ -119,45 +124,55 @@ export function InspectorDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map(({ label, value, Icon, color, bg, link }) => {
           const card = (
-            <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3">
-              <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${bg}`}>
-                <Icon className={`h-5 w-5 ${color}`} />
+            <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${bg}`}>
+                <Icon className={`h-6 w-6 ${color}`} />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{value}</p>
-                <p className="text-xs text-gray-500 leading-tight">{label}</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-2xl font-bold text-gray-900 truncate">{value}</p>
+                <p className="text-xs text-gray-500 font-medium leading-tight truncate">{label}</p>
               </div>
             </div>
           );
           return link
-            ? <Link key={label} to={link}>{card}</Link>
+            ? <Link key={label} to={link} className="block">{card}</Link>
             : <div key={label}>{card}</div>;
         })}
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h2 className="text-sm font-semibold text-gray-700 mb-4">Acciones Rápidas</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <h2 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+          Acciones Rápidas
+        </h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Link to="/inspector/scan"
-            className="flex flex-col items-center gap-2 p-4 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors">
-            <QrCode className="h-6 w-6" />
-            <span className="text-sm font-semibold">Escanear QR</span>
+            className="group flex flex-col items-center gap-3 p-5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md transition-all">
+            <div className="p-2 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
+              <QrCode className="h-6 w-6" />
+            </div>
+            <span className="text-sm font-semibold tracking-wide">Escanear QR</span>
           </Link>
           <Link to="/inspector/lookup/driver"
-            className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300 hover:text-blue-600 transition-colors">
-            <Search className="h-6 w-6" />
-            <span className="text-sm font-medium">Buscar DNI</span>
+            className="group flex flex-col items-center gap-3 p-5 rounded-xl bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-400 hover:text-blue-600 hover:shadow-sm transition-all">
+            <div className="p-2 bg-gray-100 text-gray-500 rounded-full group-hover:bg-blue-50 group-hover:text-blue-500 group-hover:scale-110 transition-all">
+              <Search className="h-6 w-6" />
+            </div>
+            <span className="text-sm font-semibold">Buscar DNI</span>
           </Link>
           <Link to="/inspector/lookup/vehicle"
-            className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300 hover:text-blue-600 transition-colors">
-            <Truck className="h-6 w-6" />
-            <span className="text-sm font-medium">Buscar Placa</span>
+            className="group flex flex-col items-center gap-3 p-5 rounded-xl bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-400 hover:text-blue-600 hover:shadow-sm transition-all">
+            <div className="p-2 bg-gray-100 text-gray-500 rounded-full group-hover:bg-blue-50 group-hover:text-blue-500 group-hover:scale-110 transition-all">
+              <Truck className="h-6 w-6" />
+            </div>
+            <span className="text-sm font-semibold">Buscar Placa</span>
           </Link>
           <Link to="/inspector/inspections/new"
-            className="flex flex-col items-center gap-2 p-4 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-colors">
-            <ClipboardPlus className="h-6 w-6" />
-            <span className="text-sm font-semibold">Nueva Inspección</span>
+            className="group flex flex-col items-center gap-3 p-5 rounded-xl bg-green-600 text-white hover:bg-green-700 hover:shadow-md transition-all">
+            <div className="p-2 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
+              <ClipboardPlus className="h-6 w-6" />
+            </div>
+            <span className="text-sm font-semibold tracking-wide">Nueva Inspección</span>
           </Link>
         </div>
       </div>
@@ -165,46 +180,48 @@ export function InspectorDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Conductor Risk Panel */}
         {(data?.conductores_en_riesgo ?? 0) + (data?.conductores_bloqueados ?? 0) > 0 && (
-          <div className="bg-white rounded-xl border border-orange-200 p-5">
+          <div className="bg-white rounded-xl border border-orange-200 p-5 shadow-sm">
             <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
               <ShieldAlert className="h-4 w-4 text-orange-500" /> Estado de Conductores
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {(data?.conductores_bloqueados ?? 0) > 0 && (
-                <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-100">
                   <span className="text-sm text-red-800 font-medium">Conductores NO_APTO (bloqueados)</span>
-                  <span className="text-lg font-bold text-red-700">{data?.conductores_bloqueados}</span>
+                  <span className="text-xl font-bold text-red-700">{data?.conductores_bloqueados}</span>
                 </div>
               )}
               {(data?.conductores_en_riesgo ?? 0) > 0 && (
-                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-100">
                   <span className="text-sm text-yellow-800 font-medium">Conductores en RIESGO</span>
-                  <span className="text-lg font-bold text-yellow-700">{data?.conductores_en_riesgo}</span>
+                  <span className="text-xl font-bold text-yellow-700">{data?.conductores_en_riesgo}</span>
                 </div>
               )}
-              <Link to="/inspector/viajes-activos" className="block text-center text-sm text-blue-600 hover:underline pt-1">
-                Ver viajes activos →
-              </Link>
+              <div className="pt-2">
+                <Link to="/inspector/viajes-activos" className="inline-flex items-center justify-center w-full py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg font-medium transition-colors">
+                  Ver viajes activos →
+                </Link>
+              </div>
             </div>
           </div>
         )}
 
         {/* Recent Alerts */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className={`bg-white rounded-xl border border-gray-200 p-5 shadow-sm ${(data?.conductores_en_riesgo ?? 0) + (data?.conductores_bloqueados ?? 0) === 0 ? 'lg:col-span-2' : ''}`}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
               <Bell className="h-4 w-4 text-gray-500" /> Alertas Recientes
             </h2>
           </div>
           {alertas.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+            <div className="flex flex-col items-center justify-center py-8 text-gray-400 bg-gray-50/50 rounded-lg border border-dashed border-gray-200">
               <CheckCircle className="h-8 w-8 mb-2 text-green-400" />
-              <p className="text-sm">Sin alertas pendientes</p>
+              <p className="text-sm font-medium">Sin alertas pendientes</p>
             </div>
           ) : (
             <ul className="space-y-3">
               {alertas.slice(0, 6).map(a => (
-                <li key={a.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-colors">
+                <li key={a.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 border border-gray-100 transition-colors shadow-sm">
                   <div className="p-2 bg-orange-50 rounded-lg shrink-0 mt-0.5">
                     <Bell className="h-4 w-4 text-orange-500" />
                   </div>
@@ -212,7 +229,7 @@ export function InspectorDashboard() {
                     <p className="text-sm font-semibold text-gray-900 truncate">{a.title}</p>
                     <p className="text-xs text-gray-500 line-clamp-2 mt-0.5 leading-relaxed">{a.content}</p>
                   </div>
-                  <span className="text-xs font-medium text-gray-400 shrink-0 bg-gray-50 px-2 py-1 rounded-md">{timeAgo(a.sent_at)}</span>
+                  <span className="text-xs font-medium text-gray-400 shrink-0 bg-gray-50 px-2 py-1 rounded-md border border-gray-200">{timeAgo(a.sent_at)}</span>
                 </li>
               ))}
             </ul>

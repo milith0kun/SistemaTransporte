@@ -81,22 +81,27 @@ export function InspectorScanPage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto space-y-5 p-4">
-      <div className="flex items-center gap-2">
-        <QrCode className="h-6 w-6 text-blue-600" />
-        <h1 className="text-xl font-bold text-gray-900">Escanear QR de Vehículo</h1>
+    <div className="max-w-lg mx-auto space-y-6 p-4">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="p-2 bg-[#1B4F72]/10 rounded-lg">
+          <QrCode className="w-6 h-6 text-[#1B4F72]" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Escanear QR de Vehículo</h2>
+          <p className="text-sm text-gray-500">Verifique el vehículo usando la cámara</p>
+        </div>
       </div>
 
       {/* Toggle */}
-      <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm font-medium">
+      <div className="flex rounded-xl p-1 bg-gray-100 border border-gray-200 overflow-hidden text-sm font-medium">
         <button
           onClick={() => { setManualMode(false); retry(); }}
-          className={`flex-1 py-2 flex items-center justify-center gap-2 transition-colors ${!manualMode ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+          className={`flex-1 py-2.5 flex items-center justify-center gap-2 rounded-lg transition-all shadow-sm ${!manualMode ? 'bg-white text-[#1B4F72] font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700'}`}>
           <QrCode className="h-4 w-4" /> Cámara
         </button>
         <button
           onClick={() => setManualMode(true)}
-          className={`flex-1 py-2 flex items-center justify-center gap-2 transition-colors ${manualMode ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+          className={`flex-1 py-2.5 flex items-center justify-center gap-2 rounded-lg transition-all shadow-sm ${manualMode ? 'bg-white text-[#1B4F72] font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700'}`}>
           <Keyboard className="h-4 w-4" /> Manual
         </button>
       </div>
@@ -106,11 +111,16 @@ export function InspectorScanPage() {
         <>
           {state === 'scanning' && (
             <>
-              <p className="text-sm text-gray-500 text-center">
+              <p className="text-sm text-gray-500 text-center font-medium bg-blue-50 p-3 rounded-lg border border-blue-100">
                 Apunta la cámara al QR pegado en el vehículo
               </p>
-              <div id="inspector-qr-reader" className="w-full rounded-2xl overflow-hidden shadow-lg" />
-              <p className="text-xs text-gray-400 text-center">El escaneo es automático</p>
+              <div className="bg-white p-3 rounded-2xl border border-gray-200 shadow-sm mt-4 mb-2">
+                <div id="inspector-qr-reader" className="w-full rounded-xl overflow-hidden [&>video]:object-cover" />
+              </div>
+              <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                El escaneo es automático
+              </p>
             </>
           )}
 
@@ -150,13 +160,13 @@ export function InspectorScanPage() {
               onChange={e => setManualPlate(e.target.value.toUpperCase())}
               onKeyDown={e => e.key === 'Enter' && handleManualSearch()}
               placeholder="Ej: ABC-123"
-              className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-mono uppercase focus:ring-2 focus:ring-blue-500 outline-none"
+              className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-mono uppercase focus:ring-2 focus:ring-[#2E86C1] focus:border-[#2E86C1] outline-none"
               maxLength={10}
             />
             <button
               onClick={handleManualSearch}
               disabled={manualLoading || !manualPlate.trim()}
-              className="px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2">
+              className="px-4 py-2.5 bg-[#1B4F72] text-white rounded-lg text-sm font-medium hover:bg-[#154360] disabled:opacity-50 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2E86C1]">
               {manualLoading
                 ? <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 : <Search className="h-4 w-4" />}

@@ -80,7 +80,7 @@ export function TripSchedulerPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <CalendarDays className="h-5 w-5 text-blue-600" />
+            <CalendarDays className="h-6 w-6 text-[#1B4F72]" />
             Programación de Viajes
           </h2>
           <p className="text-sm text-gray-500 mt-0.5">

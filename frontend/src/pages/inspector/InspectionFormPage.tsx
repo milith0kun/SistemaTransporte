@@ -95,29 +95,32 @@ export function InspectionFormPage() {
     }
   }
 
-  const inputCls = (hasErr = false) =>
-    `w-full px-3 py-2 text-sm border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 ${hasErr ? 'border-red-400 bg-red-50' : 'border-gray-300'}`;
-
   return (
-    <div className="max-w-xl mx-auto space-y-5 p-4">
-      <div className="flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="p-1.5 rounded-lg hover:bg-gray-100">
+    <div className="max-w-3xl mx-auto space-y-6 p-4 pb-24 sm:pb-8">
+      <div className="flex items-center gap-4 mb-6">
+        <button onClick={() => navigate(-1)} className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
           <ArrowLeft className="h-5 w-5 text-gray-600" />
         </button>
-        <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-          <ClipboardPlus className="h-5 w-5 text-blue-600" /> Nueva Inspección
-        </h1>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#1B4F72]/10 rounded-lg">
+            <ClipboardPlus className="w-6 h-6 text-[#1B4F72]" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Nueva Inspección</h2>
+            <p className="text-sm text-gray-500">Registre los datos de la fiscalización</p>
+          </div>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Tipo */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4 shadow-sm">
           <h2 className="text-sm font-semibold text-gray-700">Tipo de Inspección</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {TIPO_OPTIONS.map(opt => (
               <button key={opt.value} type="button" onClick={() => setTipo(opt.value)}
-                className={`px-3 py-2.5 rounded-lg text-sm font-medium border-2 transition-colors text-left ${
-                  tipo === opt.value ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                className={`px-4 py-3 rounded-xl text-sm font-medium border-2 transition-all text-left focus:outline-none focus:ring-2 focus:ring-[#2E86C1] ${
+                  tipo === opt.value ? 'border-[#1B4F72] bg-[#1B4F72]/5 text-[#1B4F72] shadow-sm' : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                 }`}>
                 {opt.label}
               </button>
@@ -126,81 +129,90 @@ export function InspectionFormPage() {
         </div>
 
         {/* Ubicación */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4 shadow-sm">
           <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-            <MapPin className="h-4 w-4" /> Ubicación
+            <div className="p-1.5 bg-blue-100 rounded-md">
+              <MapPin className="h-4 w-4 text-blue-600" />
+            </div>
+            Ubicación de Fiscalización
           </h2>
           <div>
-            <label className="text-xs font-medium text-gray-600 mb-1 block">Descripción de la ubicación *</label>
+            <label className="text-sm font-semibold text-gray-700 mb-1.5 block">Descripción de la ubicación *</label>
             <input
               value={ubicacion} onChange={e => setUbicacion(e.target.value)}
               placeholder="Ej: Terminal Terrestre Tambobamba, Km 45 ruta Arequipa"
-              className={inputCls(!ubicacion && !!error)}
+              className={`w-full px-4 py-2.5 text-sm border-2 rounded-xl outline-none transition-colors ${!ubicacion && !!error ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-200 focus:border-[#2E86C1] focus:ring-2 focus:ring-[#2E86C1]'}`}
             />
           </div>
-          <div className="flex gap-3 items-end">
-            <div className="flex-1">
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Latitud</label>
+          <div className="flex flex-col sm:flex-row gap-4 items-end bg-gray-50 p-4 rounded-xl border border-gray-100">
+            <div className="flex-1 w-full">
+              <label className="text-xs font-semibold text-gray-500 mb-1 block uppercase tracking-wider">Latitud</label>
               <input value={latitud} onChange={e => setLatitud(e.target.value)} placeholder="-13.123456"
-                className={inputCls()} />
+                className="w-full px-3 py-2 text-sm border-2 border-gray-200 rounded-lg outline-none focus:border-[#2E86C1] transition-colors" />
             </div>
-            <div className="flex-1">
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Longitud</label>
+            <div className="flex-1 w-full">
+              <label className="text-xs font-semibold text-gray-500 mb-1 block uppercase tracking-wider">Longitud</label>
               <input value={longitud} onChange={e => setLongitud(e.target.value)} placeholder="-72.654321"
-                className={inputCls()} />
+                className="w-full px-3 py-2 text-sm border-2 border-gray-200 rounded-lg outline-none focus:border-[#2E86C1] transition-colors" />
             </div>
             <button type="button" onClick={useGeo} disabled={geoLoading}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 flex items-center gap-1.5">
-              {geoLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />}
-              GPS
+              className="w-full sm:w-auto px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center gap-2 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2E86C1]">
+              {geoLoading ? <RefreshCw className="h-4 w-4 animate-spin text-[#1B4F72]" /> : <MapPin className="h-4 w-4 text-[#1B4F72]" />}
+              Capturar GPS
             </button>
           </div>
         </div>
 
-        {/* Vehículo */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
-          <h2 className="text-sm font-semibold text-gray-700">Vehículo (opcional)</h2>
-          <div className="flex gap-2">
-            <input value={vehiclePlate} onChange={e => { setVehiclePlate(e.target.value.toUpperCase()); setVehicleId(undefined); }}
-              placeholder="Placa: ABC-123"
-              className={`flex-1 ${inputCls(!!vehicleErr)}`} />
-            <button type="button" onClick={resolveVehicle}
-              className="px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-700 hover:bg-gray-200 border border-gray-300">
-              Verificar
-            </button>
+        {/* Vehículo y Conductor */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Vehículo */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3 shadow-sm">
+            <h2 className="text-sm font-semibold text-gray-700">Vehículo <span className="text-xs text-gray-400 font-normal ml-1">(Opcional)</span></h2>
+            <div className="flex gap-2">
+              <input value={vehiclePlate} onChange={e => { setVehiclePlate(e.target.value.toUpperCase()); setVehicleId(undefined); }}
+                placeholder="Placa: ABC-123"
+                className={`flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none transition-colors uppercase font-mono ${vehicleErr ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'focus:border-[#2E86C1] focus:ring-1 focus:ring-[#2E86C1]'}`} />
+              <button type="button" onClick={resolveVehicle}
+                className="px-4 py-2 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 border border-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-[#2E86C1]">
+                Buscar
+              </button>
+            </div>
+            {vehicleErr && <p className="text-xs text-red-600 font-medium px-1">{vehicleErr}</p>}
+            {vehicleId && <div className="p-2.5 bg-green-50 rounded-lg border border-green-200 flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-600" /><p className="text-sm font-medium text-green-800">Vehículo vinculado</p></div>}
           </div>
-          {vehicleErr && <p className="text-xs text-red-600">{vehicleErr}</p>}
-          {vehicleId && <p className="text-xs text-green-600 flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5" /> Vehículo encontrado</p>}
-        </div>
 
-        {/* Conductor */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
-          <h2 className="text-sm font-semibold text-gray-700">Conductor (opcional)</h2>
-          <div className="flex gap-2">
-            <input value={driverDni} onChange={e => { setDriverDni(e.target.value); setDriverId(undefined); }}
-              placeholder="DNI del conductor"
-              className={`flex-1 ${inputCls(!!driverErr)}`} />
-            <button type="button" onClick={resolveDriver}
-              className="px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-700 hover:bg-gray-200 border border-gray-300">
-              Verificar
-            </button>
+          {/* Conductor */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3 shadow-sm">
+            <h2 className="text-sm font-semibold text-gray-700">Conductor <span className="text-xs text-gray-400 font-normal ml-1">(Opcional)</span></h2>
+            <div className="flex gap-2">
+              <input value={driverDni} onChange={e => { setDriverDni(e.target.value); setDriverId(undefined); }}
+                placeholder="DNI del conductor"
+                className={`flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none transition-colors font-mono ${driverErr ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'focus:border-[#2E86C1] focus:ring-1 focus:ring-[#2E86C1]'}`} />
+              <button type="button" onClick={resolveDriver}
+                className="px-4 py-2 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 border border-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-[#2E86C1]">
+                Buscar
+              </button>
+            </div>
+            {driverErr && <p className="text-xs text-red-600 font-medium px-1">{driverErr}</p>}
+            {driverId && <div className="p-2.5 bg-green-50 rounded-lg border border-green-200 flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-600" /><p className="text-sm font-medium text-green-800">Conductor vinculado</p></div>}
           </div>
-          {driverErr && <p className="text-xs text-red-600">{driverErr}</p>}
-          {driverId && <p className="text-xs text-green-600 flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5" /> Conductor encontrado</p>}
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">{error}</div>
+          <div className="p-4 bg-red-50 border-2 border-red-200 rounded-xl text-sm font-medium text-red-800 flex items-start gap-2">
+            <div className="mt-0.5"><CheckCircle className="h-4 w-4 text-red-500 opacity-0" /></div>
+            {error}
+          </div>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 pt-4 sticky bottom-24 sm:static z-10 bg-gray-50/80 sm:bg-transparent p-4 sm:p-0 backdrop-blur-sm sm:backdrop-blur-none -mx-4 sm:mx-0 border-t border-gray-200 sm:border-0">
           <button type="button" onClick={() => navigate(-1)}
-            className="flex-1 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 hover:bg-gray-50">
+            className="flex-1 py-3 border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-white hover:border-gray-400 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2E86C1]">
             Cancelar
           </button>
           <button type="submit" disabled={saving}
-            className="flex-1 py-3 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2">
-            {saving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+            className="flex-1 py-3 bg-[#1B4F72] text-white rounded-lg text-sm font-bold hover:bg-[#154360] disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2E86C1]">
+            {saving ? <RefreshCw className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
             {saving ? 'Creando…' : 'Crear Inspección'}
           </button>
         </div>

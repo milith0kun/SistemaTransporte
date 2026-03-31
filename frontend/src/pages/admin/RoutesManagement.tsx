@@ -129,7 +129,10 @@ export function RoutesManagement() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <MapPin className="h-6 w-6 text-[#1B4F72]" />
-          <h2 className="text-xl font-bold text-gray-900">Gestión de Rutas</h2>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Gestión de Rutas</h2>
+            <p className="text-sm text-gray-500">Configuración de trayectos y tiempos de viaje</p>
+          </div>
         </div>
         <Button onClick={openCreate} size="sm">
           <Plus className="h-4 w-4 mr-1.5" /> Nueva ruta
@@ -279,7 +282,7 @@ export function RoutesManagement() {
                 <input
                   type="checkbox"
                   id="roundtrip"
-                  className="h-4 w-4 rounded border-gray-300 text-[#1B4F72]"
+                  className="h-4 w-4 rounded border-gray-300 text-[#1B4F72] focus:ring-[#1B4F72]"
                   {...form.register('allows_roundtrip')}
                 />
                 <Label htmlFor="roundtrip" className="cursor-pointer">Permite ida y vuelta</Label>

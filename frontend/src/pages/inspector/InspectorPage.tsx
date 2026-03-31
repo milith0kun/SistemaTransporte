@@ -9,9 +9,14 @@ const stats = [
 export function InspectorPage() {
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <LayoutDashboard className="h-6 w-6 text-[#1B4F72]" />
-        <h2 className="text-xl font-bold text-gray-900">Panel Inspector</h2>
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-[#1B4F72]/10 rounded-lg">
+          <LayoutDashboard className="w-6 h-6 text-[#1B4F72]" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Panel Inspector</h2>
+          <p className="text-sm text-gray-500">Resumen de actividades</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

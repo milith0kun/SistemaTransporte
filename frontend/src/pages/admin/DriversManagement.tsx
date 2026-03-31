@@ -189,7 +189,7 @@ export function DriversManagement() {
         <div className="flex items-center gap-2">
           <Users className="h-6 w-6 text-[#1B4F72]" />
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Conductores</h2>
+            <h2 className="text-xl font-bold text-gray-900">Gestión de Conductores</h2>
             <p className="text-sm text-gray-500">Gestión de conductores habilitados</p>
           </div>
         </div>

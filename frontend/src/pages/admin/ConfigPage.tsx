@@ -149,7 +149,10 @@ export function ConfigPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-2">
         <Settings className="h-6 w-6 text-[#1B4F72]" />
-        <h2 className="text-xl font-bold text-gray-900">Configuración Municipal</h2>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Configuración Municipal</h2>
+          <p className="text-sm text-gray-500">Parámetros, umbrales y reglas del sistema</p>
+        </div>
       </div>
 
       {toast && (

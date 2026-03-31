@@ -152,7 +152,10 @@ export function UsersManagement() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <UserCog className="h-6 w-6 text-[#1B4F72]" />
-          <h2 className="text-xl font-bold text-gray-900">Gestión de Usuarios</h2>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Gestión de Usuarios</h2>
+            <p className="text-sm text-gray-500">Administración de accesos y roles del sistema</p>
+          </div>
         </div>
         <Button onClick={() => setCreating(true)} size="sm">
           <Plus className="h-4 w-4 mr-1.5" /> Nuevo usuario

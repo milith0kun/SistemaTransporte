@@ -86,15 +86,18 @@ export function InspectorStatsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-blue-600" /> Mis Estadísticas
-          </h1>
-          <p className="text-sm text-gray-500 mt-0.5">Rendimiento como inspector de campo</p>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#1B4F72]/10 rounded-lg">
+            <BarChart3 className="w-6 h-6 text-[#1B4F72]" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Mis Estadísticas</h2>
+            <p className="text-sm text-gray-500">Rendimiento como inspector de campo</p>
+          </div>
         </div>
-        <button onClick={load} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50">
-          <RefreshCw className="h-4 w-4 text-gray-500" />
+        <button onClick={load} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-[#2E86C1]">
+          <RefreshCw className="h-4 w-4" />
         </button>
       </div>
 

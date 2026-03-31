@@ -232,9 +232,12 @@ export function TripRegistrationPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-xl font-bold text-gray-900">Registrar viaje</h2>
-        <p className="text-sm text-gray-500">Complete los 4 pasos para registrar un nuevo viaje.</p>
+      <div className="flex items-center gap-2">
+        <Route className="h-6 w-6 text-[#1B4F72]" />
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Registrar viaje</h2>
+          <p className="text-sm text-gray-500">Complete los 4 pasos para registrar un nuevo viaje.</p>
+        </div>
       </div>
 
       {/* Step indicator */}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Bus, AlertTriangle, Plus, CheckCircle2, Clock, CalendarDays, ChevronRight } from 'lucide-react';
+import { MapPin, Bus, AlertTriangle, Plus, CheckCircle2, Clock, CalendarDays, ChevronRight, Activity } from 'lucide-react';
 import api from '../../services/api';
 import { Trip, Driver, Vehicle, TripStatus, DriverStatus, PaginatedResponse } from '../../types';
 import { scheduledTripsApi, type ScheduledTrip } from '../../services/scheduledTripsApi';
@@ -81,9 +81,12 @@ export function OperatorDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900">Panel Operador</h2>
-          <p className="text-sm text-gray-500">Resumen de operaciones del día</p>
+        <div className="flex items-center gap-2">
+          <Activity className="h-6 w-6 text-[#1B4F72]" />
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Panel Operador</h2>
+            <p className="text-sm text-gray-500">Resumen de operaciones del día</p>
+          </div>
         </div>
         <div className="flex gap-2">
           <Link to="/operator/schedule">
