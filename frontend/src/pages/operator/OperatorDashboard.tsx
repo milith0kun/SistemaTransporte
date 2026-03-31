@@ -116,41 +116,41 @@ export function OperatorDashboard() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <StatCard
           label="Viajes activos"
           value={activeTrips.length}
           Icon={MapPin}
           color="text-green-600"
-          bg="bg-green-50"
+          bg="bg-green-100/50"
         />
         <StatCard
-          label="Conductores disponibles"
+          label="Conductores aptos"
           value={aptaDrivers}
           Icon={CheckCircle2}
           color="text-blue-600"
-          bg="bg-blue-50"
+          bg="bg-blue-100/50"
         />
         <StatCard
-          label="En riesgo / bloqueados"
+          label="En riesgo/Bloqueados"
           value={riesgoDrivers.length + noAptaDrivers.length}
           Icon={AlertTriangle}
-          color="text-amber-600"
-          bg="bg-amber-50"
+          color="text-orange-600"
+          bg="bg-orange-100/50"
         />
         <StatCard
           label="Vehículos operativos"
           value={opVehicles}
           Icon={Bus}
           color="text-indigo-600"
-          bg="bg-indigo-50"
+          bg="bg-indigo-100/50"
         />
         <StatCard
-          label="Viajes programados hoy"
+          label="Programados hoy"
           value={safeSched.length}
           Icon={CalendarDays}
           color="text-purple-600"
-          bg="bg-purple-50"
+          bg="bg-purple-100/50"
         />
       </div>
 
@@ -274,14 +274,14 @@ function StatCard({
   bg: string;
 }) {
   return (
-    <Card>
-      <CardContent className="flex items-center gap-3 pt-5 pb-5">
-        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${bg}`}>
-          <Icon className={`h-5 w-5 ${color}`} />
+    <Card className="hover:shadow-md transition-shadow border-gray-200">
+      <CardContent className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-5 pb-5">
+        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-sm ${bg}`}>
+          <Icon className={`h-6 w-6 ${color}`} />
         </div>
         <div>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-          <p className="text-xs text-gray-500 leading-tight mt-0.5">{label}</p>
+          <p className="text-3xl font-bold text-gray-900 leading-none">{value}</p>
+          <p className="text-sm font-medium text-gray-500 mt-1">{label}</p>
         </div>
       </CardContent>
     </Card>

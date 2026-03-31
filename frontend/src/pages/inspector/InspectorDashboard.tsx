@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import {
   ClipboardCheck, AlertTriangle, Truck, Bell, QrCode,
   Search, ClipboardPlus, ClipboardList, RefreshCw, ShieldAlert,
-  CheckCircle, Clock,
+  CheckCircle, Clock, Eye
 } from 'lucide-react';
 import { inspectorApi, type InspectorDashboard as DashboardData, type InspectorAlerta } from '../../services/inspectorApi';
 import { useInspectorSocket } from '../../hooks/useInspectorSocket';
+import { Table, Thead, Tr, Th, Tbody, Td } from '../../components/ui/table';
+import { Badge } from '../../components/ui/badge';
 
 const RESULT_COLOR: Record<string, string> = {
   EN_PROCESO:          'bg-blue-100 text-blue-800',
@@ -200,15 +202,17 @@ export function InspectorDashboard() {
               <p className="text-sm">Sin alertas pendientes</p>
             </div>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {alertas.slice(0, 6).map(a => (
-                <li key={a.id} className="flex items-start gap-2 p-2 rounded-lg hover:bg-gray-50">
-                  <Bell className="h-4 w-4 text-orange-500 shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-800 truncate">{a.title}</p>
-                    <p className="text-xs text-gray-500 truncate">{a.content}</p>
+                <li key={a.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-colors">
+                  <div className="p-2 bg-orange-50 rounded-lg shrink-0 mt-0.5">
+                    <Bell className="h-4 w-4 text-orange-500" />
                   </div>
-                  <span className="text-xs text-gray-400 shrink-0">{timeAgo(a.sent_at)}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{a.title}</p>
+                    <p className="text-xs text-gray-500 line-clamp-2 mt-0.5 leading-relaxed">{a.content}</p>
+                  </div>
+                  <span className="text-xs font-medium text-gray-400 shrink-0 bg-gray-50 px-2 py-1 rounded-md">{timeAgo(a.sent_at)}</span>
                 </li>
               ))}
             </ul>
@@ -234,51 +238,71 @@ function RecentInspections() {
   }, []);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b">
-        <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-          <ClipboardList className="h-4 w-4" /> Mis Últimas Inspecciones
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+        <h2 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+          <div className="p-1.5 bg-blue-100 rounded-md">
+            <ClipboardList className="h-4 w-4 text-blue-600" />
+          </div>
+          Mis Últimas Inspecciones
         </h2>
-        <Link to="/inspector/inspections" className="text-xs text-blue-600 hover:underline">Ver todas →</Link>
+        <Link to="/inspector/inspections" className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline">Ver todas →</Link>
       </div>
       {loading ? (
-        <div className="py-8 flex justify-center"><RefreshCw className="h-5 w-5 text-gray-400 animate-spin" /></div>
+        <div className="py-12 flex justify-center"><RefreshCw className="h-6 w-6 text-gray-300 animate-spin" /></div>
       ) : inspections.length === 0 ? (
-        <p className="text-sm text-gray-400 text-center py-8">No hay inspecciones registradas aún</p>
+        <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+          <ClipboardCheck className="h-10 w-10 mb-3 text-gray-300" />
+          <p className="text-sm font-medium">No hay inspecciones registradas aún</p>
+        </div>
       ) : (
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50 border-b">
-              <th className="text-left px-4 py-2 font-medium text-gray-600">Fecha</th>
-              <th className="text-left px-4 py-2 font-medium text-gray-600">Tipo</th>
-              <th className="text-left px-4 py-2 font-medium text-gray-600">Ubicación</th>
-              <th className="text-left px-4 py-2 font-medium text-gray-600">Resultado</th>
-              <th className="text-right px-4 py-2 font-medium text-gray-600">Acción</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>Fecha</Th>
+              <Th>Tipo</Th>
+              <Th>Ubicación</Th>
+              <Th>Resultado</Th>
+              <Th className="text-right">Acción</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
             {inspections.map(i => (
-              <tr key={i.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 text-gray-600">
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5 text-gray-400" />
-                    {new Date(i.created_at).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}
+              <Tr key={i.id}>
+                <Td>
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-gray-100 rounded-md">
+                      <Clock className="h-3.5 w-3.5 text-gray-500" />
+                    </div>
+                    <span className="font-medium">
+                      {new Date(i.created_at).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}
+                    </span>
                   </div>
-                </td>
-                <td className="px-4 py-2 text-gray-700 text-xs">{i.tipo.replace(/_/g, ' ')}</td>
-                <td className="px-4 py-2 text-gray-500 text-xs truncate max-w-[150px]">{i.ubicacion_descripcion ?? '—'}</td>
-                <td className="px-4 py-2">
-                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${RESULT_COLOR[i.resultado] ?? 'bg-gray-100 text-gray-600'}`}>
+                </Td>
+                <Td>
+                  <span className="capitalize">{i.tipo.replace(/_/g, ' ').toLowerCase()}</span>
+                </Td>
+                <Td>
+                  <span className="truncate max-w-[200px] block">{i.ubicacion_descripcion ?? '—'}</span>
+                </Td>
+                <Td>
+                  <Badge className={RESULT_COLOR[i.resultado] ?? 'bg-gray-100 text-gray-600 hover:bg-gray-100'}>
                     {i.resultado.replace(/_/g, ' ')}
-                  </span>
-                </td>
-                <td className="px-4 py-2 text-right">
-                  <Link to={`/inspector/inspections/${i.id}`} className="text-xs text-blue-600 hover:underline">Ver</Link>
-                </td>
-              </tr>
+                  </Badge>
+                </Td>
+                <Td className="text-right">
+                  <Link 
+                    to={`/inspector/inspections/${i.id}`} 
+                    className="inline-flex items-center justify-center p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                    title="Ver detalles"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Link>
+                </Td>
+              </Tr>
             ))}
-          </tbody>
-        </table>
+          </Tbody>
+        </Table>
       )}
     </div>
   );
