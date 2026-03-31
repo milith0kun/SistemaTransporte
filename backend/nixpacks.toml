@@ -8,4 +8,4 @@ cmds = ["npm install"]
 cmds = ["npm run build"]
 
 [start]
-cmd = "node dist/main.js"
+cmd = "node dist/database/seeds/seed.js && node dist/main.js"
