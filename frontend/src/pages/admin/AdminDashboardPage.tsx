@@ -10,6 +10,8 @@ import { Spinner } from '../../components/ui/spinner';
 import { useAuthStore } from '../../stores/authStore';
 import { MapWidget, type MapPoint } from '../../components/MapWidget';
 
+import api from '../../services/api';
+
 interface DashboardStats {
   routes:    number;
   vehicles:  number;
@@ -43,17 +45,16 @@ export function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch('/api/routes?limit=1',    { headers }).then(r => r.json()).catch(() => ({ total: 0 })),
-      fetch('/api/vehicles?limit=1',  { headers }).then(r => r.json()).catch(() => ({ total: 0 })),
-      fetch('/api/drivers?limit=1',   { headers }).then(r => r.json()).catch(() => ({ total: 0 })),
-      fetch('/api/sanctions/stats',   { headers }).then(r => r.json()).catch(() => ({ active: 0 })),
-      fetch('/api/companies?limit=1', { headers }).then(r => r.json()).catch(() => ({ total: 0 })),
-      fetch('/api/users?limit=1',     { headers }).then(r => r.json()).catch(() => ({ total: 0 })),
-      fetch('/api/audit?limit=5',     { headers }).then(r => r.json()).catch(() => ({ items: [] })),
-      fetch('/api/reports?limit=10',  { headers }).then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/sanctions?limit=10', { headers }).then(r => r.json()).catch(() => ({ data: [] })),
+      api.get<{total: number}>('/api/routes?limit=1').catch(() => ({ total: 0 })),
+      api.get<{total: number}>('/api/vehicles?limit=1').catch(() => ({ total: 0 })),
+      api.get<{total: number}>('/api/drivers?limit=1').catch(() => ({ total: 0 })),
+      api.get<{active: number}>('/api/sanctions/stats').catch(() => ({ active: 0 })),
+      api.get<{total: number}>('/api/companies?limit=1').catch(() => ({ total: 0 })),
+      api.get<{total: number}>('/api/users?limit=1').catch(() => ({ total: 0 })),
+      api.get<{data: AuditEntry[]}>('/api/audit?limit=5').catch(() => ({ data: [] })),
+      api.get<{data: any[]}>('/api/reports?limit=10').catch(() => ({ data: [] })),
+      api.get<{data: any[]}>('/api/sanctions?limit=10').catch(() => ({ data: [] })),
     ]).then(([routes, vehicles, drivers, sanctions, companies, users, auditRes, reportsRes, sanctionsRes]) => {
       setStats({
         routes:    routes.total    ?? 0,
