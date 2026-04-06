@@ -162,6 +162,7 @@ export class EmailService {
       [NotificationType.VIAJE_CERRADO_AUTO]:         '🔒',
       [NotificationType.PAUSA_RECOMENDADA]:          '☕',
       [NotificationType.ALERTA_CONDUCTOR_DIFERENTE]: '🚨',
+      [NotificationType.EXCESO_VELOCIDAD]:           '🏎️',
     };
     return icons[type] ?? '🔔';
   }

@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Bus, Route, Building2, Users, FileText,
   ShieldAlert, QrCode, MapPin, Star, ClipboardList,
   UserCog, Activity, X, Settings, Truck, ClipboardPlus,
-  BarChart3, Search,
+  BarChart3, Search, Gauge,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { UserRole } from '../../types';
@@ -18,8 +18,9 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { label: 'Conductores',  to: '/admin/drivers',    Icon: Users },
     { label: 'Vehículos',    to: '/admin/vehicles',   Icon: Bus },
     { label: 'Usuarios',     to: '/admin/users',      Icon: UserCog },
-    { label: 'Auditoría',    to: '/admin/audit',      Icon: ClipboardList },
-    { label: 'Configuración',to: '/admin/config',     Icon: Settings },
+    { label: 'Auditoría',    to: '/admin/audit',         Icon: ClipboardList },
+    { label: 'Vel. Límites', to: '/admin/speed-config',  Icon: Gauge },
+    { label: 'Configuración',to: '/admin/config',        Icon: Settings },
   ],
   [UserRole.FISCAL]: [
     { label: 'Dashboard',    to: '/dashboard',              Icon: LayoutDashboard },
@@ -28,15 +29,17 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { label: 'Sanciones',    to: '/dashboard/sanctions',    Icon: ShieldAlert },
     { label: 'Rutas',        to: '/dashboard/routes',       Icon: Route },
     { label: 'Empresas',     to: '/dashboard/companies',    Icon: Building2 },
-    { label: 'Analíticas',   to: '/dashboard/analytics',    Icon: Activity },
+    { label: 'Analíticas',        to: '/dashboard/analytics',     Icon: Activity },
+    { label: 'Alertas Velocidad', to: '/dashboard/speed-alerts',  Icon: Gauge },
   ],
   [UserRole.OPERADOR_EMPRESA]: [
     { label: 'Dashboard',        to: '/operator',              Icon: LayoutDashboard },
     { label: 'Calendario',       to: '/operator/schedule',     Icon: MapPin },
     { label: 'Registrar Viaje',  to: '/operator/trips/new',    Icon: ClipboardPlus },
     { label: 'Mis Viajes',       to: '/operator/trips',        Icon: ClipboardList },
-    { label: 'Conductores',      to: '/operator/drivers',      Icon: Users },
-    { label: 'Vehículos',        to: '/operator/vehicles',     Icon: Bus },
+    { label: 'Conductores',       to: '/operator/drivers',       Icon: Users },
+    { label: 'Vehículos',         to: '/operator/vehicles',      Icon: Bus },
+    { label: 'Alertas Velocidad', to: '/operator/speed-alerts',  Icon: Gauge },
   ],
   [UserRole.CIUDADANO]: [
     { label: 'Escanear QR',  to: '/citizen',              Icon: QrCode },

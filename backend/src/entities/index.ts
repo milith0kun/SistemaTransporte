@@ -13,3 +13,5 @@ export { Appeal, AppealDecisionStatus } from './appeal.entity';
 export { IncentivePoint, IncentiveActionType } from './incentive-point.entity';
 export { Notification, NotificationChannel, NotificationStatus } from './notification.entity';
 export { AuditLog } from './audit-log.entity';
+export { SpeedConfig, TipoZona } from './speed-config.entity';
+export { SpeedAlert, SpeedAlertSeverity, SpeedAlertStatus } from './speed-alert.entity';

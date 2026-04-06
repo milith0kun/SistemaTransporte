@@ -52,4 +52,6 @@ export type WsEvent =
   | 'report:new'
   | 'notification:new'
   | 'dashboard:update'
+  | 'speed:alert'
+  | 'vehicle:position'
   | 'pong';

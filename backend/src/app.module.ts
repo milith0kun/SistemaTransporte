@@ -28,6 +28,7 @@ import { AuditModule } from './modules/audit/audit.module';
 import { MunicipalitiesModule } from './modules/municipalities/municipalities.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { InspectorModule } from './modules/inspector/inspector.module';
+import { SpeedModule }     from './modules/speed/speed.module';
 
 @Module({
   imports: [
@@ -85,6 +86,7 @@ import { InspectorModule } from './modules/inspector/inspector.module';
     MunicipalitiesModule,
     UploadsModule,
     InspectorModule,
+    SpeedModule,
   ],
   controllers: [AppController],
   providers: [

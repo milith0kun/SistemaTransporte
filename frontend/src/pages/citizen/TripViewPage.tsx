@@ -1,5 +1,5 @@
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { Bus, MapPin, UserCheck, Shield, Clock, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { Bus, MapPin, UserCheck, Shield, Clock, CheckCircle2, XCircle, AlertTriangle, Gauge } from 'lucide-react';
 import type { QrScanResult } from '../../types';
 import { useAuthStore } from '../../stores/authStore';
 import api from '../../services/api';
@@ -187,6 +187,18 @@ export function TripViewPage() {
           </button>
         </div>
       </div>
+
+      {/* Botón Tacómetro */}
+      {trip && (
+        <button
+          onClick={() => navigate(`/citizen/trip/${tripId}/speedometer`)}
+          className="w-full py-3.5 bg-[#1B4F72] hover:bg-[#2E86C1] text-white rounded-xl
+                     font-semibold flex items-center justify-center gap-2 active:scale-95 transition-all"
+        >
+          <Gauge className="h-5 w-5" />
+          Activar Tacómetro GPS
+        </button>
+      )}
 
       {/* Action buttons (always visible if SÍ was implied by scanning) */}
       <div className="space-y-3 pb-4">

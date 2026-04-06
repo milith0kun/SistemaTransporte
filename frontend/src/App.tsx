@@ -29,10 +29,14 @@ import { ReportsManagementPage }      from './pages/dashboard/ReportsManagementP
 import { FiscalRoutesManagementPage } from './pages/dashboard/RoutesManagementPage';
 import { CompaniesPage }              from './pages/dashboard/CompaniesPage';
 import { AnalyticsPage }              from './pages/dashboard/AnalyticsPage';
+import { SpeedAlertsPage }            from './pages/dashboard/speed/SpeedAlertsPage';
+import { SpeedConfigListPage }        from './pages/admin/speed/SpeedConfigListPage';
+import { SpeedConfigFormPage }        from './pages/admin/speed/SpeedConfigFormPage';
 import { OperatorDashboard } from './pages/operator/OperatorDashboard';
 import { TripRegistrationPage } from './pages/operator/TripRegistrationPage';
 import { TripsListPage } from './pages/operator/TripsListPage';
 import { TripSchedulerPage } from './pages/operator/TripSchedulerPage';
+import { SpeedAlertsOperatorPage } from './pages/operator/SpeedAlertsOperatorPage';
 
 import { CitizenPage } from './pages/citizen/CitizenPage';
 import { QrScanPage } from './pages/citizen/QrScanPage';
@@ -41,6 +45,7 @@ import { ReportFormPage } from './pages/citizen/ReportFormPage';
 import { CitizenProfile } from './pages/citizen/CitizenProfile';
 import { CitizenRanking } from './pages/citizen/CitizenRanking';
 import { MyReportsPage } from './pages/citizen/MyReportsPage';
+import { SpeedometerPage } from './pages/citizen/SpeedometerPage';
 
 import { InspectorDashboard }      from './pages/inspector/InspectorDashboard';
 import { InspectorScanPage }       from './pages/inspector/InspectorScanPage';
@@ -98,6 +103,9 @@ export default function App() {
               <Route path="/admin/companies/:id"      element={<CompanyDetailPage />} />
               <Route path="/admin/drivers"            element={<DriversManagement />} />
               <Route path="/admin/vehicles"           element={<VehiclesManagement />} />
+              <Route path="/admin/speed-config"       element={<SpeedConfigListPage />} />
+              <Route path="/admin/speed-config/new"   element={<SpeedConfigFormPage />} />
+              <Route path="/admin/speed-config/:id/edit" element={<SpeedConfigFormPage />} />
             </Route>
           </Route>
 
@@ -111,6 +119,7 @@ export default function App() {
               <Route path="/dashboard/routes"       element={<FiscalRoutesManagementPage />} />
               <Route path="/dashboard/companies"    element={<CompaniesPage />} />
               <Route path="/dashboard/analytics"    element={<AnalyticsPage />} />
+              <Route path="/dashboard/speed-alerts" element={<SpeedAlertsPage />} />
             </Route>
           </Route>
 
@@ -123,6 +132,7 @@ export default function App() {
               <Route path="/operator/trips/new"     element={<TripRegistrationPage />} />
               <Route path="/operator/drivers"       element={<DriversManagement />} />
               <Route path="/operator/vehicles"      element={<VehiclesManagement />} />
+              <Route path="/operator/speed-alerts"  element={<SpeedAlertsOperatorPage />} />
             </Route>
           </Route>
 
@@ -136,6 +146,7 @@ export default function App() {
               <Route path="/citizen/reports"            element={<MyReportsPage />} />
               <Route path="/citizen/profile"            element={<CitizenProfile />} />
               <Route path="/citizen/ranking"            element={<CitizenRanking />} />
+              <Route path="/citizen/trip/:tripId/speedometer" element={<SpeedometerPage />} />
             </Route>
           </Route>
 

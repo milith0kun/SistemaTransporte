@@ -94,4 +94,14 @@ export class NotificationsGateway
   emitFatigueAlert(municipalityId: string, data: object): void {
     this.emitToMunicipality(municipalityId, 'fatigue:alert', data);
   }
+
+  /** Emitir alerta de velocidad a municipalidad y opcionalmente a empresa */
+  emitSpeedAlert(municipalityId: string, companyId: string | undefined, data: object): void {
+    this.emitToMunicipality(municipalityId, 'speed:alert', data);
+  }
+
+  /** Emitir posición de vehículo en tiempo real */
+  emitVehiclePosition(municipalityId: string, data: object): void {
+    this.emitToMunicipality(municipalityId, 'vehicle:position', data);
+  }
 }

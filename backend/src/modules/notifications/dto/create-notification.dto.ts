@@ -20,6 +20,7 @@ export enum NotificationType {
   VIAJE_CERRADO_AUTO         = 'VIAJE_CERRADO_AUTO',
   PAUSA_RECOMENDADA          = 'PAUSA_RECOMENDADA',
   ALERTA_CONDUCTOR_DIFERENTE = 'ALERTA_CONDUCTOR_DIFERENTE',
+  EXCESO_VELOCIDAD           = 'EXCESO_VELOCIDAD',
 }
 
 export type NotificationPriority = 'ALTA' | 'MEDIA' | 'BAJA';
