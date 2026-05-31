@@ -1,3 +1,6 @@
+[variables]
+PORT = "3000"
+
 providers = ["node"]
 
 [phases.install]
